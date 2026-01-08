@@ -14,6 +14,14 @@ from .models import (
 )
 
 
+class DecimalEncoder(json.JSONEncoder):
+    """Custom JSON encoder for Decimal objects."""
+    def default(self, obj):
+        if isinstance(obj, Decimal):
+            return str(obj)
+        return super().default(obj)
+
+
 class GeradorRelatorios:
     """Gerador de relatórios estruturados."""
 
@@ -241,7 +249,7 @@ class GeradorRelatorios:
             caminho_arquivo: Caminho do arquivo de saída
         """
         with open(caminho_arquivo, 'w', encoding='utf-8') as f:
-            json.dump(relatorio, f, ensure_ascii=False, indent=2)
+            json.dump(relatorio, f, ensure_ascii=False, indent=2, cls=DecimalEncoder)
 
     def exportar_json_str(self, relatorio: Dict[str, Any]) -> str:
         """
@@ -253,4 +261,4 @@ class GeradorRelatorios:
         Returns:
             String JSON
         """
-        return json.dumps(relatorio, ensure_ascii=False, indent=2)
+        return json.dumps(relatorio, ensure_ascii=False, indent=2, cls=DecimalEncoder)

@@ -79,7 +79,9 @@ class XMLReader:
             raise ValueError("Estrutura de NF-e inválida")
 
         # Dados da identificação
-        ide = nfe.find('.//nfe:ide', self.NAMESPACES) or nfe.find('.//ide')
+        ide = nfe.find('.//nfe:ide', self.NAMESPACES)
+        if ide is None:
+            ide = nfe.find('.//ide')
         chave = nfe.get('Id', '').replace('NFe', '')
         numero = ide.findtext('.//nfe:nNF', namespaces=self.NAMESPACES) or ide.findtext('.//nNF') or ""
         serie = ide.findtext('.//nfe:serie', namespaces=self.NAMESPACES) or ide.findtext('.//serie') or ""
@@ -94,18 +96,26 @@ class XMLReader:
         data_emissao = datetime.fromisoformat(data_emissao_str.replace('Z', '+00:00')) if data_emissao_str else datetime.now()
 
         # Dados do emitente
-        emit = nfe.find('.//nfe:emit', self.NAMESPACES) or nfe.find('.//emit')
+        emit = nfe.find('.//nfe:emit', self.NAMESPACES)
+        if emit is None:
+            emit = nfe.find('.//emit')
         cnpj_emit = emit.findtext('.//nfe:CNPJ', namespaces=self.NAMESPACES) or emit.findtext('.//CNPJ') or ""
 
         # Dados do destinatário
-        dest = nfe.find('.//nfe:dest', self.NAMESPACES) or nfe.find('.//dest')
+        dest = nfe.find('.//nfe:dest', self.NAMESPACES)
+        if dest is None:
+            dest = nfe.find('.//dest')
         cnpj_dest = ""
         if dest is not None:
             cnpj_dest = dest.findtext('.//nfe:CNPJ', namespaces=self.NAMESPACES) or dest.findtext('.//CNPJ') or ""
 
         # Total da nota
-        total = nfe.find('.//nfe:total', self.NAMESPACES) or nfe.find('.//total')
-        icms_tot = total.find('.//nfe:ICMSTot', self.NAMESPACES) or total.find('.//ICMSTot')
+        total = nfe.find('.//nfe:total', self.NAMESPACES)
+        if total is None:
+            total = nfe.find('.//total')
+        icms_tot = total.find('.//nfe:ICMSTot', self.NAMESPACES)
+        if icms_tot is None:
+            icms_tot = total.find('.//ICMSTot')
         valor_total = Decimal(icms_tot.findtext('.//nfe:vNF', namespaces=self.NAMESPACES) or icms_tot.findtext('.//vNF') or "0")
 
         # Classifica como entrada ou saída
@@ -136,7 +146,9 @@ class XMLReader:
 
     def _ler_item_nfe(self, det) -> Item:
         """Lê um item de NF-e."""
-        prod = det.find('.//nfe:prod', self.NAMESPACES) or det.find('.//prod')
+        prod = det.find('.//nfe:prod', self.NAMESPACES)
+        if prod is None:
+            prod = det.find('.//prod')
         
         codigo = prod.findtext('.//nfe:cProd', namespaces=self.NAMESPACES) or prod.findtext('.//cProd') or ""
         descricao = prod.findtext('.//nfe:xProd', namespaces=self.NAMESPACES) or prod.findtext('.//xProd') or ""
@@ -158,7 +170,9 @@ class XMLReader:
         )
 
         # Lê tributos
-        imposto = det.find('.//nfe:imposto', self.NAMESPACES) or det.find('.//imposto')
+        imposto = det.find('.//nfe:imposto', self.NAMESPACES)
+        if imposto is None:
+            imposto = det.find('.//imposto')
         if imposto is not None:
             item.tributos.extend(self._ler_tributos_item(imposto))
 
@@ -169,7 +183,9 @@ class XMLReader:
         tributos = []
 
         # ICMS
-        icms = imposto.find('.//nfe:ICMS', self.NAMESPACES) or imposto.find('.//ICMS')
+        icms = imposto.find('.//nfe:ICMS', self.NAMESPACES)
+        if icms is None:
+            icms = imposto.find('.//ICMS')
         if icms is not None:
             # Pode ter vários tipos: ICMS00, ICMS10, etc.
             for child in icms:
@@ -189,9 +205,13 @@ class XMLReader:
                     ))
 
         # IPI
-        ipi = imposto.find('.//nfe:IPI', self.NAMESPACES) or imposto.find('.//IPI')
+        ipi = imposto.find('.//nfe:IPI', self.NAMESPACES)
+        if ipi is None:
+            ipi = imposto.find('.//IPI')
         if ipi is not None:
-            ipi_trib = ipi.find('.//nfe:IPITrib', self.NAMESPACES) or ipi.find('.//IPITrib')
+            ipi_trib = ipi.find('.//nfe:IPITrib', self.NAMESPACES)
+            if ipi_trib is None:
+                ipi_trib = ipi.find('.//IPITrib')
             if ipi_trib is not None:
                 cst = ipi_trib.findtext('.//nfe:CST', namespaces=self.NAMESPACES) or ipi_trib.findtext('.//CST') or ""
                 v_bc = Decimal(ipi_trib.findtext('.//nfe:vBC', namespaces=self.NAMESPACES) or ipi_trib.findtext('.//vBC') or "0")
@@ -208,7 +228,9 @@ class XMLReader:
                     ))
 
         # PIS
-        pis = imposto.find('.//nfe:PIS', self.NAMESPACES) or imposto.find('.//PIS')
+        pis = imposto.find('.//nfe:PIS', self.NAMESPACES)
+        if pis is None:
+            pis = imposto.find('.//PIS')
         if pis is not None:
             for child in pis:
                 cst = child.findtext('.//nfe:CST', namespaces=self.NAMESPACES) or child.findtext('.//CST') or ""
@@ -226,7 +248,9 @@ class XMLReader:
                     ))
 
         # COFINS
-        cofins = imposto.find('.//nfe:COFINS', self.NAMESPACES) or imposto.find('.//COFINS')
+        cofins = imposto.find('.//nfe:COFINS', self.NAMESPACES)
+        if cofins is None:
+            cofins = imposto.find('.//COFINS')
         if cofins is not None:
             for child in cofins:
                 cst = child.findtext('.//nfe:CST', namespaces=self.NAMESPACES) or child.findtext('.//CST') or ""
