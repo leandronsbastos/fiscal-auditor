@@ -56,7 +56,7 @@ class ValidadorTributario:
         Returns:
             ResultadoValidacao com o resultado da validação
         """
-        resultado = ResultadoValidacao(valido=True)
+        resultado = ResultadoValidacao(valido=True, chave_acesso=documento.chave)
 
         # Valida cada item
         for item in documento.items:

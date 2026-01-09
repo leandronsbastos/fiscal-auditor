@@ -146,6 +146,7 @@ class DocumentoFiscal:
 class ResultadoValidacao:
     """Resultado da validação tributária."""
     valido: bool
+    chave_acesso: str = ""
     mensagens: List[str] = field(default_factory=list)
     creditos_aproveitaveis: List[Tributo] = field(default_factory=list)
     creditos_indevidos: List[Tributo] = field(default_factory=list)
@@ -155,6 +156,7 @@ class ResultadoValidacao:
         """Converte para dicionário."""
         return {
             "valido": self.valido,
+            "chave_acesso": self.chave_acesso,
             "mensagens": self.mensagens,
             "creditos_aproveitaveis": [c.to_dict() for c in self.creditos_aproveitaveis],
             "creditos_indevidos": [c.to_dict() for c in self.creditos_indevidos],

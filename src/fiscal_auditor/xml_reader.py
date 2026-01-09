@@ -118,8 +118,19 @@ class XMLReader:
             icms_tot = total.find('.//ICMSTot')
         valor_total = Decimal(icms_tot.findtext('.//nfe:vNF', namespaces=self.NAMESPACES) or icms_tot.findtext('.//vNF') or "0")
 
+        # Pega CFOP do primeiro item para ajudar na classificação
+        cfop_doc = ""
+        det_list = nfe.findall('.//nfe:det', self.NAMESPACES) or nfe.findall('.//det')
+        if det_list:
+            primeiro_det = det_list[0]
+            prod_primeiro = primeiro_det.find('.//nfe:prod', self.NAMESPACES)
+            if prod_primeiro is None:
+                prod_primeiro = primeiro_det.find('.//prod')
+            if prod_primeiro is not None:
+                cfop_doc = prod_primeiro.findtext('.//nfe:CFOP', namespaces=self.NAMESPACES) or prod_primeiro.findtext('.//CFOP') or ""
+
         # Classifica como entrada ou saída
-        tipo_movimento = self._classificar_movimento(cnpj_emit, cnpj_dest, tp_nf)
+        tipo_movimento = self._classificar_movimento(cnpj_emit, cnpj_dest, tp_nf, cfop_doc)
 
         # Cria documento
         doc = DocumentoFiscal(
@@ -267,6 +278,65 @@ class XMLReader:
                         cst=cst
                     ))
 
+        # IBS e CBS (Reforma Tributária)
+        ibscbs = imposto.find('.//nfe:IBSCBS', self.NAMESPACES)
+        if ibscbs is None:
+            ibscbs = imposto.find('.//IBSCBS')
+        if ibscbs is not None:
+            cst = ibscbs.findtext('.//nfe:CST', namespaces=self.NAMESPACES) or ibscbs.findtext('.//CST') or ""
+            
+            # Lê informações de IBS e CBS
+            g_ibscbs = ibscbs.find('.//nfe:gIBSCBS', self.NAMESPACES)
+            if g_ibscbs is None:
+                g_ibscbs = ibscbs.find('.//gIBSCBS')
+            
+            if g_ibscbs is not None:
+                # Base de cálculo comum
+                v_bc = Decimal(g_ibscbs.findtext('.//nfe:vBC', namespaces=self.NAMESPACES) or g_ibscbs.findtext('.//vBC') or "0")
+                
+                # IBS (Imposto sobre Bens e Serviços)
+                v_ibs = Decimal(g_ibscbs.findtext('.//nfe:vIBS', namespaces=self.NAMESPACES) or g_ibscbs.findtext('.//vIBS') or "0")
+                
+                # Lê alíquotas de IBS (UF + Municipal)
+                g_ibs_uf = g_ibscbs.find('.//nfe:gIBSUF', self.NAMESPACES)
+                if g_ibs_uf is None:
+                    g_ibs_uf = g_ibscbs.find('.//gIBSUF')
+                p_ibs_uf = Decimal((g_ibs_uf.findtext('.//nfe:pIBSUF', namespaces=self.NAMESPACES) or g_ibs_uf.findtext('.//pIBSUF') or "0") if g_ibs_uf is not None else "0")
+                
+                g_ibs_mun = g_ibscbs.find('.//nfe:gIBSMun', self.NAMESPACES)
+                if g_ibs_mun is None:
+                    g_ibs_mun = g_ibscbs.find('.//gIBSMun')
+                p_ibs_mun = Decimal((g_ibs_mun.findtext('.//nfe:pIBSMun', namespaces=self.NAMESPACES) or g_ibs_mun.findtext('.//pIBSMun') or "0") if g_ibs_mun is not None else "0")
+                
+                p_ibs = p_ibs_uf + p_ibs_mun
+                
+                if v_ibs > 0:
+                    tributos.append(Tributo(
+                        tipo=TipoTributo.IBS,
+                        base_calculo=v_bc,
+                        aliquota=p_ibs,
+                        valor=v_ibs,
+                        cst=cst
+                    ))
+                
+                # CBS (Contribuição sobre Bens e Serviços)
+                g_cbs = g_ibscbs.find('.//nfe:gCBS', self.NAMESPACES)
+                if g_cbs is None:
+                    g_cbs = g_ibscbs.find('.//gCBS')
+                
+                if g_cbs is not None:
+                    p_cbs = Decimal(g_cbs.findtext('.//nfe:pCBS', namespaces=self.NAMESPACES) or g_cbs.findtext('.//pCBS') or "0")
+                    v_cbs = Decimal(g_cbs.findtext('.//nfe:vCBS', namespaces=self.NAMESPACES) or g_cbs.findtext('.//vCBS') or "0")
+                    
+                    if v_cbs > 0:
+                        tributos.append(Tributo(
+                            tipo=TipoTributo.CBS,
+                            base_calculo=v_bc,
+                            aliquota=p_cbs,
+                            valor=v_cbs,
+                            cst=cst
+                        ))
+
         return tributos
 
     def _ler_cte(self, root) -> DocumentoFiscal:
@@ -324,33 +394,43 @@ class XMLReader:
 
         return doc
 
-    def _classificar_movimento(self, cnpj_emit: str, cnpj_dest: str, tp_nf: str) -> TipoMovimento:
+    def _classificar_movimento(self, cnpj_emit: str, cnpj_dest: str, tp_nf: str, cfop: str = "") -> TipoMovimento:
         """
         Classifica o documento como Entrada ou Saída.
         
-        Critérios:
-        - Se CNPJ empresa = CNPJ destinatário: Entrada
-        - Se CNPJ empresa = CNPJ emitente: Saída
-        - Se tpNF = 0: Entrada
-        - Se tpNF = 1: Saída
-        - Se CFOP começa com 1, 2, 3: Entrada
-        - Se CFOP começa com 5, 6, 7: Saída
+        Critérios (em ordem de prioridade):
+        1. Se CFOP começa com 1, 2, 3: Entrada (MAIS CONFIÁVEL)
+        2. Se CFOP começa com 5, 6, 7: Saída (MAIS CONFIÁVEL)
+        3. Se CNPJ empresa = CNPJ destinatário: Entrada
+        4. Se CNPJ empresa = CNPJ emitente: Saída
+        5. Se tpNF = 0: Entrada
+        6. Se tpNF = 1: Saída
         """
-        # Normaliza CNPJs
-        cnpj_emit_norm = cnpj_emit.replace(".", "").replace("/", "").replace("-", "")
-        cnpj_dest_norm = cnpj_dest.replace(".", "").replace("/", "").replace("-", "")
+        # Critério 1 e 2: Verifica pelo CFOP (MAIS CONFIÁVEL)
+        if cfop:
+            primeiro_digito = cfop[0] if len(cfop) > 0 else ""
+            if primeiro_digito in ["1", "2", "3"]:
+                return TipoMovimento.ENTRADA
+            elif primeiro_digito in ["5", "6", "7"]:
+                return TipoMovimento.SAIDA
 
-        # Verifica pelo CNPJ primeiro (mais confiável)
-        if cnpj_dest_norm == self.cnpj_empresa:
+        # Normaliza CNPJs
+        cnpj_emit_norm = cnpj_emit.replace(".", "").replace("/", "").replace("-", "").strip()
+        cnpj_dest_norm = cnpj_dest.replace(".", "").replace("/", "").replace("-", "").strip()
+        cnpj_empresa_norm = self.cnpj_empresa.strip()
+
+        # Critério 3 e 4: Verifica pelo CNPJ
+        if cnpj_dest_norm and cnpj_dest_norm == cnpj_empresa_norm:
             return TipoMovimento.ENTRADA
-        elif cnpj_emit_norm == self.cnpj_empresa:
+        elif cnpj_emit_norm and cnpj_emit_norm == cnpj_empresa_norm:
             return TipoMovimento.SAIDA
 
-        # Se não conseguiu determinar pelo CNPJ, usa tpNF
+        # Critério 5 e 6: Verifica pelo tpNF
         if tp_nf == "0":
             return TipoMovimento.ENTRADA
         elif tp_nf == "1":
             return TipoMovimento.SAIDA
 
         # Default: considera entrada se não conseguiu determinar
+        # (melhor errar para o lado conservador)
         return TipoMovimento.ENTRADA

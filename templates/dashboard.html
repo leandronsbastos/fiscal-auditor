@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Fiscal Auditor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Fiscal Auditor</h1>
+            <p>Dashboard de Resultados</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <a href="/" class="btn btn-secondary">← Novo Processamento</a>
+                <a href="/produtos" class="btn btn-primary" style="background: #28a745;">📦 Visão por Produto</a>
+                <a href="/analise-tributaria" class="btn btn-primary" style="background: #667eea;">📊 Análise Tributária</a>
+            </div>
+        </header>
+
+        <!-- Resumo Geral -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>Documentos Processados</h3>
+                <div class="summary-value">{{ documentos|length }}</div>
+                <small>Total de documentos</small>
+            </div>
+            <div class="summary-card">
+                <h3>Entradas</h3>
+                <div class="summary-value">{{ relatorios.entradas.quantidade_documentos }}</div>
+                <small>R$ {{ "%.2f"|format(relatorios.entradas.valor_total|float) }}</small>
+            </div>
+            <div class="summary-card">
+                <h3>Saídas</h3>
+                <div class="summary-value">{{ relatorios.saidas.quantidade_documentos }}</div>
+                <small>R$ {{ "%.2f"|format(relatorios.saidas.valor_total|float) }}</small>
+            </div>
+            <div class="summary-card">
+                <h3>Período</h3>
+                <div class="summary-value">{{ mapa.periodo }}</div>
+                <small>Competência</small>
+            </div>
+        </div>
+
+        <!-- Mapa de Apuração -->
+        <div class="card">
+            <h2>📈 Mapa de Apuração</h2>
+            <div class="table-responsive">
+                <table class="apuracao-table">
+                    <thead>
+                        <tr>
+                            <th>Tributo</th>
+                            <th>Débitos (Saídas)</th>
+                            <th>Créditos (Entradas)</th>
+                            <th>Saldo</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for apuracao in mapa.apuracoes %}
+                        <tr>
+                            <td><strong>{{ apuracao.tipo.value }}</strong></td>
+                            <td class="valor-debito">R$ {{ "%.2f"|format(apuracao.debitos) }}</td>
+                            <td class="valor-credito">R$ {{ "%.2f"|format(apuracao.creditos) }}</td>
+                            <td class="valor-saldo">
+                                <strong>R$ {{ "%.2f"|format(apuracao.saldo|abs) }}</strong>
+                            </td>
+                            <td>
+                                {% if apuracao.saldo > 0 %}
+                                <span class="badge badge-danger">A Recolher</span>
+                                {% elif apuracao.saldo < 0 %}
+                                <span class="badge badge-success">Credor</span>
+                                {% else %}
+                                <span class="badge badge-neutral">Zerado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Documentos Processados -->
+        <div class="card">
+            <h2>📄 Documentos Processados</h2>
+            <div class="table-responsive">
+                <table class="documentos-table">
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Movimento</th>
+                            <th>Emitente</th>
+                            <th>Destinatário</th>
+                            <th>Valor Total</th>
+                            <th>Itens</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in documentos %}
+                        <tr>
+                            <td>{{ doc.numero }}</td>
+                            <td><span class="badge badge-info">{{ doc.tipo.value }}</span></td>
+                            <td>
+                                {% if doc.tipo_movimento.value == 'Entrada' %}
+                                <span class="badge badge-success">⬇️ {{ doc.tipo_movimento.value }}</span>
+                                {% else %}
+                                <span class="badge badge-warning">⬆️ {{ doc.tipo_movimento.value }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ doc.cnpj_emitente }}</td>
+                            <td>{{ doc.cnpj_destinatario }}</td>
+                            <td>R$ {{ "%.2f"|format(doc.valor_total) }}</td>
+                            <td>{{ doc.items|length }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Validações -->
+        <div class="card">
+            <h2>✅ Resultado das Validações</h2>
+            <div style="background: white; border-radius: 8px; padding: 20px;">
+                {% for validacao in validacoes %}
+                <div style="border-left: 4px solid {% if validacao.valido %}#28a745{% else %}#dc3545{% endif %}; padding: 15px; margin-bottom: 15px; background: {% if validacao.valido %}#d4edda{% else %}#f8d7da{% endif %}; border-radius: 5px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 1.5em; margin-right: 10px;">{% if validacao.valido %}✅{% else %}⚠️{% endif %}</span>
+                        <div>
+                            <strong style="font-size: 1.1em;">{% if validacao.valido %}Documento Válido{% else %}Documento com Problemas{% endif %}</strong>
+                            <div style="color: #666; font-size: 0.9em; margin-top: 3px;">Chave: {{ validacao.chave_acesso[:44] }}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 10px 0;">
+                        <div style="background: white; padding: 8px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 1.3em; font-weight: bold; color: #28a745;">{{ validacao.creditos_aproveitaveis|length }}</div>
+                            <div style="font-size: 0.85em; color: #666;">Créditos Aproveitáveis</div>
+                        </div>
+                        <div style="background: white; padding: 8px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 1.3em; font-weight: bold; color: #dc3545;">{{ validacao.creditos_indevidos|length }}</div>
+                            <div style="font-size: 0.85em; color: #666;">Créditos Indevidos</div>
+                        </div>
+                        <div style="background: white; padding: 8px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 1.3em; font-weight: bold; color: #ffc107;">{{ validacao.creditos_glosaveis|length }}</div>
+                            <div style="font-size: 0.85em; color: #666;">Créditos Glosáveis</div>
+                        </div>
+                    </div>
+                    
+                    {% if validacao.mensagens %}
+                    <div style="margin-top: 10px; padding: 10px; background: white; border-radius: 5px;">
+                        <strong style="color: #666; font-size: 0.9em;">Mensagens ({{ validacao.mensagens|length }}):</strong>
+                        <ul style="margin: 8px 0 0 20px; padding: 0; list-style-type: disc;">
+                            {% for msg in validacao.mensagens %}
+                            <li style="color: #333; font-size: 0.9em; margin: 4px 0;">{{ msg }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Relatórios para Download -->
+        <div class="card">
+            <h2>📥 Exportar Relatórios</h2>
+            <div class="relatorios-grid">
+                <button onclick="exportarExcel()" class="relatorio-link" style="border: none; cursor: pointer;">
+                    <span class="icon">📊</span>
+                    <span>Exportar para Excel</span>
+                </button>
+                <button onclick="exportarPDF()" class="relatorio-link" style="border: none; cursor: pointer;">
+                    <span class="icon">📄</span>
+                    <span>Exportar para PDF</span>
+                </button>
+                <a href="/api/relatorios/entradas" class="relatorio-link" download>
+                    <span class="icon">📄</span>
+                    <span>Demonstrativo de Entradas (JSON)</span>
+                </a>
+                <a href="/api/relatorios/saidas" class="relatorio-link" download>
+                    <span class="icon">📄</span>
+                    <span>Demonstrativo de Saídas (JSON)</span>
+                </a>
+                <a href="/api/relatorios/mapa" class="relatorio-link" download>
+                    <span class="icon">📊</span>
+                    <span>Mapa de Apuração (JSON)</span>
+                </a>
+                <a href="/api/relatorios/validacao" class="relatorio-link" download>
+                    <span class="icon">✅</span>
+                    <span>Relatório de Validação (JSON)</span>
+                </a>
+                <a href="/api/relatorios/completo" class="relatorio-link" download>
+                    <span class="icon">📋</span>
+                    <span>Relatório Completo (JSON)</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Fiscal Auditor © 2026 - Sistema de Auditoria e Apuração Tributária</p>
+    </footer>
+
+    <script>
+        async function exportarExcel() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/export/excel', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `relatorio_fiscal_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Erro ao exportar para Excel');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao exportar para Excel');
+            }
+        }
+
+        async function exportarPDF() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/export/pdf', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `relatorio_fiscal_${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Erro ao exportar para PDF');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao exportar para PDF');
+            }
+        }
+    </script>
+</body>
+</html>

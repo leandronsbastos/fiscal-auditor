@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiscal Auditor - Sistema de Auditoria Tributária</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .navbar-info {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .btn-back {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">📊 Fiscal Auditor</div>
+        <div class="navbar-actions">
+            <span class="navbar-info" id="empresaInfo">Carregando empresa...</span>
+            <a href="/painel" class="btn-back">← Voltar ao Painel</a>
+        </div>
+    </nav>
+
+    <div class="container"
+        <header>
+            <h1>📊 Fiscal Auditor</h1>
+            <p>Sistema de Auditoria e Apuração Tributária</p>
+        </header>
+
+        {% if error %}
+        <div class="alert alert-error">
+            <strong>⚠️ Erro:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2>Upload de Documentos Fiscais</h2>
+            <p>Faça upload dos arquivos XML (NF-e, NFC-e, CT-e, NFS-e) para processamento</p>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="tipo_data">Filtrar por Data de:</label>
+                    <select id="tipo_data" name="tipo_data" required>
+                        <option value="emissao">Emissão</option>
+                        <option value="autorizacao">Autorização</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="data_inicio">Data Início:</label>
+                    <input type="date" id="data_inicio" name="data_inicio" required>
+                    <small>Documentos a partir desta data</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="data_fim">Data Fim:</label>
+                    <input type="date" id="data_fim" name="data_fim" required>
+                    <small>Documentos até esta data</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="arquivos">Arquivos XML:</label>
+                    <div class="file-upload">
+                        <input type="file" id="arquivos" name="arquivos" 
+                               accept=".xml" multiple required>
+                        <label for="arquivos" class="file-label">
+                            <span id="file-chosen">Escolher arquivos XML...</span>
+                        </label>
+                    </div>
+                    <small id="file-count"></small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Processar Documentos
+                </button>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processando documentos...</p>
+            </div>
+
+            <div id="result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>📁 Classificação</h3>
+                <p>Identificação automática de entradas e saídas</p>
+            </div>
+            <div class="feature-card">
+                <h3>✅ Validação</h3>
+                <p>Verificação de conformidade tributária</p>
+            </div>
+            <div class="feature-card">
+                <h3>🧮 Apuração</h3>
+                <p>Cálculo de ICMS, IPI, PIS, COFINS, IBS e CBS</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 Relatórios</h3>
+                <p>Geração de demonstrativos e mapas</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obter empresa_id da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const empresaId = urlParams.get('empresa_id');
+        const token = localStorage.getItem('token');
+
+        // Verificar autenticação
+        if (!token || !empresaId) {
+            window.location.href = '/painel';
+        }
+
+        // Carregar informações da empresa
+        async function carregarEmpresa() {
+            try {
+                const response = await fetch(`/api/empresas/${empresaId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const empresa = await response.json();
+                    document.getElementById('empresaInfo').textContent = 
+                        `Empresa: ${empresa.razao_social}`;
+                    
+                    // Definir período padrão (mês atual)
+                    const hoje = new Date();
+                    const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                    const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+                    
+                    document.getElementById('data_inicio').value = primeiroDia.toISOString().split('T')[0];
+                    document.getElementById('data_fim').value = ultimoDia.toISOString().split('T')[0];
+                } else if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar empresa:', error);
+            }
+        }
+
+        carregarEmpresa();
+
+        // Mostrar nome dos arquivos selecionados
+        const fileInput = document.getElementById('arquivos');
+        const fileChosen = document.getElementById('file-chosen');
+        const fileCount = document.getElementById('file-count');
+
+        fileInput.addEventListener('change', function() {
+            const numFiles = this.files.length;
+            if (numFiles === 0) {
+                fileChosen.textContent = 'Escolher arquivos XML...';
+                fileCount.textContent = '';
+            } else if (numFiles === 1) {
+                fileChosen.textContent = this.files[0].name;
+                fileCount.textContent = '1 arquivo selecionado';
+            } else {
+                fileChosen.textContent = `${numFiles} arquivos selecionados`;
+                fileCount.textContent = Array.from(this.files).map(f => f.name).join(', ');
+            }
+        });
+
+        // Processar formulário
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            // Adicionar empresa_id ao FormData
+            formData.append('empresa_id', empresaId);
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                submitBtn.disabled = false;
+                
+                if (data.success) {
+                    result.className = 'result result-success';
+                    result.innerHTML = `
+                        <h3>✅ Sucesso!</h3>
+                        <p>${data.message}</p>
+                        ${data.erros ? `<p><strong>Avisos:</strong> ${data.erros.join(', ')}</p>` : ''}
+                        <a href="/dashboard" class="btn btn-success">Ver Resultados</a>
+                    `;
+                } else {
+                    result.className = 'result result-error';
+                    result.innerHTML = `
+                        <h3>❌ Erro</h3>
+                        <p>${data.message}</p>
+                        ${data.erros ? `<ul>${data.erros.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+                    `;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                submitBtn.disabled = false;
+                
+                result.className = 'result result-error';
+                result.innerHTML = `
+                    <h3>❌ Erro</h3>
+                    <p>Erro ao processar: ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

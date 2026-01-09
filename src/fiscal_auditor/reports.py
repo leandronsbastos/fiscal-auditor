@@ -262,3 +262,226 @@ class GeradorRelatorios:
             String JSON
         """
         return json.dumps(relatorio, ensure_ascii=False, indent=2, cls=DecimalEncoder)
+
+    def gerar_relatorio_por_produto(self, documentos: List[DocumentoFiscal]) -> Dict[str, Any]:
+        """
+        Gera relatório agrupado por produto (NCM).
+        
+        Args:
+            documentos: Lista de documentos fiscais
+            
+        Returns:
+            Dicionário com o relatório por produto
+        """
+        produtos = {}
+        
+        for doc in documentos:
+            for item in doc.items:
+                # Chave: NCM + Descrição
+                chave = f"{item.ncm}|{item.descricao}"
+                
+                if chave not in produtos:
+                    produtos[chave] = {
+                        "ncm": item.ncm,
+                        "descricao": item.descricao,
+                        "entradas": {
+                            "quantidade": Decimal('0'),
+                            "valor_total": Decimal('0'),
+                            "documentos": 0,
+                            "tributos": {}
+                        },
+                        "saidas": {
+                            "quantidade": Decimal('0'),
+                            "valor_total": Decimal('0'),
+                            "documentos": 0,
+                            "tributos": {}
+                        }
+                    }
+                
+                # Define se é entrada ou saída
+                movimento = "entradas" if doc.tipo_movimento == TipoMovimento.ENTRADA else "saidas"
+                
+                # Acumula quantidades e valores
+                produtos[chave][movimento]["quantidade"] += item.quantidade
+                produtos[chave][movimento]["valor_total"] += item.valor_total
+                produtos[chave][movimento]["documentos"] += 1
+                
+                # Acumula tributos por tipo
+                for tributo in item.tributos:
+                    tipo_trib = tributo.tipo.value
+                    if tipo_trib not in produtos[chave][movimento]["tributos"]:
+                        produtos[chave][movimento]["tributos"][tipo_trib] = Decimal('0')
+                    produtos[chave][movimento]["tributos"][tipo_trib] += tributo.valor
+        
+        # Converte para lista e formata valores
+        produtos_lista = []
+        for chave, dados in produtos.items():
+            produto_info = {
+                "ncm": dados["ncm"],
+                "descricao": dados["descricao"],
+                "entradas": {
+                    "quantidade": str(dados["entradas"]["quantidade"]),
+                    "valor_total": str(dados["entradas"]["valor_total"]),
+                    "documentos": dados["entradas"]["documentos"],
+                    "tributos": {k: str(v) for k, v in dados["entradas"]["tributos"].items()}
+                },
+                "saidas": {
+                    "quantidade": str(dados["saidas"]["quantidade"]),
+                    "valor_total": str(dados["saidas"]["valor_total"]),
+                    "documentos": dados["saidas"]["documentos"],
+                    "tributos": {k: str(v) for k, v in dados["saidas"]["tributos"].items()}
+                },
+                "saldo": {
+                    "quantidade": str(dados["entradas"]["quantidade"] - dados["saidas"]["quantidade"]),
+                    "valor": str(dados["entradas"]["valor_total"] - dados["saidas"]["valor_total"])
+                }
+            }
+            produtos_lista.append(produto_info)
+        
+        # Ordena por NCM
+        produtos_lista.sort(key=lambda x: x["ncm"])
+        
+        return {
+            "tipo": "Relatório por Produto",
+            "data_geracao": datetime.now().isoformat(),
+            "total_produtos": len(produtos_lista),
+            "produtos": produtos_lista
+        }
+
+    def gerar_analise_tributaria_produtos(self, documentos: List[DocumentoFiscal]) -> Dict[str, Any]:
+        """
+        Gera análise tributária detalhada por produto.
+        
+        Args:
+            documentos: Lista de documentos fiscais
+            
+        Returns:
+            Dicionário com análise tributária detalhada
+        """
+        produtos = {}
+        
+        for doc in documentos:
+            for item in doc.items:
+                chave = f"{item.ncm}|{item.descricao}"
+                
+                if chave not in produtos:
+                    produtos[chave] = {
+                        "ncm": item.ncm,
+                        "descricao": item.descricao,
+                        "cfop_entradas": set(),
+                        "cfop_saidas": set(),
+                        "entradas": {
+                            "quantidade": Decimal('0'),
+                            "valor_total": Decimal('0'),
+                            "documentos": 0,
+                            "tributos": {
+                                "ICMS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "IPI": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "PIS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "COFINS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "IBS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "CBS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0}
+                            }
+                        },
+                        "saidas": {
+                            "quantidade": Decimal('0'),
+                            "valor_total": Decimal('0'),
+                            "documentos": 0,
+                            "tributos": {
+                                "ICMS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "IPI": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "PIS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "COFINS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "IBS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0},
+                                "CBS": {"base": Decimal('0'), "valor": Decimal('0'), "aliquota_media": Decimal('0'), "count": 0}
+                            }
+                        }
+                    }
+                
+                movimento = "entradas" if doc.tipo_movimento == TipoMovimento.ENTRADA else "saidas"
+                
+                # Registra CFOPs
+                if movimento == "entradas":
+                    produtos[chave]["cfop_entradas"].add(item.cfop)
+                else:
+                    produtos[chave]["cfop_saidas"].add(item.cfop)
+                
+                # Acumula quantidades e valores
+                produtos[chave][movimento]["quantidade"] += item.quantidade
+                produtos[chave][movimento]["valor_total"] += item.valor_total
+                produtos[chave][movimento]["documentos"] += 1
+                
+                # Acumula tributos detalhadamente
+                for tributo in item.tributos:
+                    tipo_trib = tributo.tipo.value
+                    if tipo_trib in produtos[chave][movimento]["tributos"]:
+                        produtos[chave][movimento]["tributos"][tipo_trib]["base"] += tributo.base_calculo
+                        produtos[chave][movimento]["tributos"][tipo_trib]["valor"] += tributo.valor
+                        produtos[chave][movimento]["tributos"][tipo_trib]["aliquota_media"] += tributo.aliquota
+                        produtos[chave][movimento]["tributos"][tipo_trib]["count"] += 1
+        
+        # Converte para lista e calcula alíquotas médias
+        produtos_lista = []
+        for chave, dados in produtos.items():
+            # Calcula alíquotas médias
+            for movimento in ["entradas", "saidas"]:
+                for tipo_trib, info in dados[movimento]["tributos"].items():
+                    if info["count"] > 0:
+                        info["aliquota_media"] = info["aliquota_media"] / info["count"]
+                    else:
+                        info["aliquota_media"] = Decimal('0')
+            
+            # Calcula diferenças tributárias (crédito - débito)
+            diferencas = {}
+            for tipo_trib in ["ICMS", "IPI", "PIS", "COFINS", "IBS", "CBS"]:
+                credito = dados["entradas"]["tributos"][tipo_trib]["valor"]
+                debito = dados["saidas"]["tributos"][tipo_trib]["valor"]
+                diferencas[tipo_trib] = {
+                    "credito": str(credito),
+                    "debito": str(debito),
+                    "diferenca": str(credito - debito),
+                    "percentual_entrada": str(dados["entradas"]["tributos"][tipo_trib]["aliquota_media"]),
+                    "percentual_saida": str(dados["saidas"]["tributos"][tipo_trib]["aliquota_media"])
+                }
+            
+            produto_info = {
+                "ncm": dados["ncm"],
+                "descricao": dados["descricao"],
+                "cfop_entradas": sorted(list(dados["cfop_entradas"])),
+                "cfop_saidas": sorted(list(dados["cfop_saidas"])),
+                "entradas": {
+                    "quantidade": str(dados["entradas"]["quantidade"]),
+                    "valor_total": str(dados["entradas"]["valor_total"]),
+                    "documentos": dados["entradas"]["documentos"],
+                    "tributos": {
+                        k: {
+                            "base": str(v["base"]),
+                            "valor": str(v["valor"]),
+                            "aliquota_media": str(v["aliquota_media"])
+                        } for k, v in dados["entradas"]["tributos"].items()
+                    }
+                },
+                "saidas": {
+                    "quantidade": str(dados["saidas"]["quantidade"]),
+                    "valor_total": str(dados["saidas"]["valor_total"]),
+                    "documentos": dados["saidas"]["documentos"],
+                    "tributos": {
+                        k: {
+                            "base": str(v["base"]),
+                            "valor": str(v["valor"]),
+                            "aliquota_media": str(v["aliquota_media"])
+                        } for k, v in dados["saidas"]["tributos"].items()
+                    }
+                },
+                "analise_tributaria": diferencas
+            }
+            produtos_lista.append(produto_info)
+        
+        produtos_lista.sort(key=lambda x: x["ncm"])
+        
+        return {
+            "tipo": "Análise Tributária por Produto",
+            "data_geracao": datetime.now().isoformat(),
+            "total_produtos": len(produtos_lista),
+            "produtos": produtos_lista
+        }

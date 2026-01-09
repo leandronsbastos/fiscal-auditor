@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visão por Produto - Fiscal Auditor</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📦 Fiscal Auditor</h1>
+            <p>Visão por Produto</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <a href="/dashboard" class="btn btn-secondary">← Dashboard</a>
+                <a href="/" class="btn btn-secondary">Novo Processamento</a>
+            </div>
+        </header>
+
+        <!-- Resumo -->
+        <div class="summary-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));">
+            <div class="summary-card">
+                <h3>Total de Produtos</h3>
+                <div class="summary-value">{{ relatorio.total_produtos }}</div>
+                <small>NCMs diferentes</small>
+            </div>
+            <div class="summary-card">
+                <h3>Gerado em</h3>
+                <div class="summary-value" style="font-size: 1.2em;">
+                    {{ relatorio.data_geracao[:10] }}
+                </div>
+                <small>{{ relatorio.data_geracao[11:19] }}</small>
+            </div>
+        </div>
+
+        <!-- Tabela de Produtos -->
+        <div class="card">
+            <h2>📊 Movimentação por Produto</h2>
+            <p>Visão consolidada de entradas e saídas por NCM</p>
+            
+            <div class="table-responsive">
+                <table class="produtos-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">NCM</th>
+                            <th rowspan="2">Descrição do Produto</th>
+                            <th colspan="3" style="text-align: center; background: #d4edda;">Entradas</th>
+                            <th colspan="3" style="text-align: center; background: #fff3cd;">Saídas</th>
+                            <th colspan="2" style="text-align: center; background: #d1ecf1;">Saldo</th>
+                        </tr>
+                        <tr>
+                            <!-- Entradas -->
+                            <th style="background: #d4edda;">Qtd</th>
+                            <th style="background: #d4edda;">Valor Total</th>
+                            <th style="background: #d4edda;">Docs</th>
+                            <!-- Saídas -->
+                            <th style="background: #fff3cd;">Qtd</th>
+                            <th style="background: #fff3cd;">Valor Total</th>
+                            <th style="background: #fff3cd;">Docs</th>
+                            <!-- Saldo -->
+                            <th style="background: #d1ecf1;">Qtd</th>
+                            <th style="background: #d1ecf1;">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in relatorio.produtos %}
+                        <tr>
+                            <td><strong>{{ produto.ncm }}</strong></td>
+                            <td>{{ produto.descricao }}</td>
+                            <!-- Entradas -->
+                            <td style="background: #f0f9f4;">{{ "%.2f"|format(produto.entradas.quantidade|float) }}</td>
+                            <td style="background: #f0f9f4;" class="valor-credito">
+                                R$ {{ "%.2f"|format(produto.entradas.valor_total|float) }}
+                            </td>
+                            <td style="background: #f0f9f4;">{{ produto.entradas.documentos }}</td>
+                            <!-- Saídas -->
+                            <td style="background: #fefbf3;">{{ "%.2f"|format(produto.saidas.quantidade|float) }}</td>
+                            <td style="background: #fefbf3;" class="valor-debito">
+                                R$ {{ "%.2f"|format(produto.saidas.valor_total|float) }}
+                            </td>
+                            <td style="background: #fefbf3;">{{ produto.saidas.documentos }}</td>
+                            <!-- Saldo -->
+                            <td style="background: #f0f7fb;">
+                                <strong>{{ "%.2f"|format(produto.saldo.quantidade|float) }}</strong>
+                            </td>
+                            <td style="background: #f0f7fb;">
+                                <strong>R$ {{ "%.2f"|format(produto.saldo.valor|float) }}</strong>
+                            </td>
+                        </tr>
+                        <tr class="produto-tributos-row">
+                            <td colspan="10">
+                                <details>
+                                    <summary style="cursor: pointer; color: #667eea; font-weight: 600;">
+                                        Ver tributos detalhados
+                                    </summary>
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 10px; padding: 15px; background: #f9f9f9; border-radius: 5px;">
+                                        <!-- Tributos de Entrada -->
+                                        <div>
+                                            <h4 style="color: #28a745; margin-bottom: 10px;">📥 Tributos de Entrada</h4>
+                                            {% if produto.entradas.tributos %}
+                                            <table style="width: 100%; font-size: 0.9em;">
+                                                <tr style="background: #e8f5e9;">
+                                                    <th style="padding: 8px; text-align: left;">Tributo</th>
+                                                    <th style="padding: 8px; text-align: right;">Valor</th>
+                                                </tr>
+                                                {% for tributo, valor in produto.entradas.tributos.items() %}
+                                                <tr>
+                                                    <td style="padding: 8px;">{{ tributo }}</td>
+                                                    <td style="padding: 8px; text-align: right;" class="valor-credito">
+                                                        R$ {{ "%.2f"|format(valor|float) }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </table>
+                                            {% else %}
+                                            <p style="color: #666;">Nenhum tributo registrado</p>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Tributos de Saída -->
+                                        <div>
+                                            <h4 style="color: #dc3545; margin-bottom: 10px;">📤 Tributos de Saída</h4>
+                                            {% if produto.saidas.tributos %}
+                                            <table style="width: 100%; font-size: 0.9em;">
+                                                <tr style="background: #fff3cd;">
+                                                    <th style="padding: 8px; text-align: left;">Tributo</th>
+                                                    <th style="padding: 8px; text-align: right;">Valor</th>
+                                                </tr>
+                                                {% for tributo, valor in produto.saidas.tributos.items() %}
+                                                <tr>
+                                                    <td style="padding: 8px;">{{ tributo }}</td>
+                                                    <td style="padding: 8px; text-align: right;" class="valor-debito">
+                                                        R$ {{ "%.2f"|format(valor|float) }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </table>
+                                            {% else %}
+                                            <p style="color: #666;">Nenhum tributo registrado</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </details>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Exportar Relatórios -->
+        <div class="card">
+            <h2>📥 Exportar Relatórios</h2>
+            <div class="relatorios-grid">
+                <button onclick="exportarExcel()" class="relatorio-link" style="border: none; cursor: pointer;">
+                    <span class="icon">📊</span>
+                    <span>Exportar para Excel</span>
+                </button>
+                <button onclick="exportarPDF()" class="relatorio-link" style="border: none; cursor: pointer;">
+                    <span class="icon">📄</span>
+                    <span>Exportar para PDF</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="card">
+            <h2>📈 Estatísticas</h2>
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div class="stat-card" style="background: #d4edda; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #155724;">Total Entradas</h3>
+                    <p style="font-size: 1.5em; font-weight: bold; color: #28a745;">
+                        R$ {{ "%.2f"|format(total_entradas_valor) }}
+                    </p>
+                    <p style="color: #666;">Quantidade: {{ "%.2f"|format(total_entradas_qtd) }}</p>
+                    <p style="color: #666;">Documentos: {{ total_entradas_docs }}</p>
+                </div>
+                
+                <div class="stat-card" style="background: #fff3cd; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #856404;">Total Saídas</h3>
+                    <p style="font-size: 1.5em; font-weight: bold; color: #dc3545;">
+                        R$ {{ "%.2f"|format(total_saidas_valor) }}
+                    </p>
+                    <p style="color: #666;">Quantidade: {{ "%.2f"|format(total_saidas_qtd) }}</p>
+                    <p style="color: #666;">Documentos: {{ total_saidas_docs }}</p>
+                </div>
+                
+                <div class="stat-card" style="background: #d1ecf1; padding: 20px; border-radius: 8px;">
+                    <h3 style="color: #0c5460;">Saldo Total</h3>
+                    <p style="font-size: 1.5em; font-weight: bold; color: #667eea;">
+                        R$ {{ "%.2f"|format(total_entradas_valor - total_saidas_valor) }}
+                    </p>
+                    <p style="color: #666;">Quantidade: {{ "%.2f"|format(total_entradas_qtd - total_saidas_qtd) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Fiscal Auditor © 2026 - Visão por Produto</p>
+    </footer>
+
+    <script>
+        async function exportarExcel() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/export/excel', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `relatorio_fiscal_${new Date().toISOString().split('T')[0]}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Erro ao exportar para Excel');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao exportar para Excel');
+            }
+        }
+
+        async function exportarPDF() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/export/pdf', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `relatorio_fiscal_${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Erro ao exportar para PDF');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao exportar para PDF');
+            }
+        }
+    </script>
+</body>
+</html>
