@@ -9,8 +9,42 @@ Este sistema é responsável por:
 - Validar a conformidade tributária
 - Calcular a apuração dos tributos incidentes
 - Gerar relatórios estruturados em formato JSON
+- **[NOVO]** Processar e armazenar XMLs em datalake completo (Serviço ETL)
 
-## Módulos
+## 🆕 Serviço ETL - Datalake de Documentos Fiscais
+
+O projeto agora inclui um **serviço ETL completo e independente** para processamento de arquivos XML fiscais:
+
+### Características do Serviço ETL
+- ✅ Extração completa de todos os campos de NF-e e NFC-e
+- ✅ Armazenamento em banco de dados PostgreSQL (datalake estruturado)
+- ✅ Processamento em lote de grandes volumes
+- ✅ Detecção automática de duplicatas
+- ✅ Logs detalhados e rastreabilidade completa
+- ✅ Consultas SQL otimizadas
+
+### Início Rápido - ETL
+```bash
+# 1. Configurar
+python setup_etl.py
+
+# 2. Inicializar banco
+python run_etl.py --init-db
+
+# 3. Processar XMLs
+python run_etl.py --diretorio "C:\XMLs"
+
+# Ou usar o menu interativo (Windows)
+etl.bat
+```
+
+### Documentação do ETL
+- **Guia Rápido**: [GUIA_ETL.md](GUIA_ETL.md)
+- **Documentação Completa**: [etl_service/README.md](etl_service/README.md)
+- **Exemplos de Código**: [exemplo_etl.py](exemplo_etl.py)
+- **Consultas SQL**: [etl_service/consultas_uteis.sql](etl_service/consultas_uteis.sql)
+
+## Módulos do Sistema Principal
 
 ### 1. Leitura e Classificação de XML (`xml_reader.py`)
 - Leitura de arquivos XML contendo documentos fiscais eletrônicos

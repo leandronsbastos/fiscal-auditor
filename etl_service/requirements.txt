@@ -1,0 +1,12 @@
+# Requisitos do Serviço ETL - Documentos Fiscais
+
+## Dependências Principais
+sqlalchemy>=2.0.0          # ORM para banco de dados
+psycopg2-binary>=2.9.0     # Driver PostgreSQL
+lxml>=4.9.0                # Parser XML
+
+## Dependências Opcionais
+python-dotenv>=1.0.0       # Gerenciamento de variáveis de ambiente
+
+## Banco de Dados
+# PostgreSQL 12 ou superior recomendado
