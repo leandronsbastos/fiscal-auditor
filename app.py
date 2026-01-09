@@ -4,7 +4,7 @@ Aplicação Web do Fiscal Auditor.
 Interface web para upload de XMLs e visualização de relatórios tributários.
 """
 from fastapi import FastAPI, UploadFile, File, Form, Request, Depends, HTTPException
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -684,10 +684,9 @@ async def exportar_excel(
     arquivo_excel = exportador.gerar_excel(dados_relatorio)
     
     # Retornar arquivo
-    return FileResponse(
+    return StreamingResponse(
         arquivo_excel,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename=f"relatorio_fiscal_{periodo.replace('/', '_')}.xlsx",
         headers={"Content-Disposition": f"attachment; filename=relatorio_fiscal_{periodo.replace('/', '_')}.xlsx"}
     )
 
@@ -730,10 +729,9 @@ async def exportar_pdf(
     arquivo_pdf = exportador.gerar_pdf(dados_relatorio)
     
     # Retornar arquivo
-    return FileResponse(
+    return StreamingResponse(
         arquivo_pdf,
         media_type="application/pdf",
-        filename=f"relatorio_fiscal_{periodo.replace('/', '_')}.pdf",
         headers={"Content-Disposition": f"attachment; filename=relatorio_fiscal_{periodo.replace('/', '_')}.pdf"}
     )
 
