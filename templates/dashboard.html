@@ -129,9 +129,9 @@
                 {% set total_docs = validacoes|length %}
                 {% set docs_validos = validacoes|selectattr('valido', 'equalto', true)|list|length %}
                 {% set docs_problemas = total_docs - docs_validos %}
-                {% set total_aproveitaveis = validacoes|sum(attribute='creditos_aproveitaveis')|length if validacoes else 0 %}
-                {% set total_indevidos = validacoes|sum(attribute='creditos_indevidos')|length if validacoes else 0 %}
-                {% set total_glosaveis = validacoes|sum(attribute='creditos_glosaveis')|length if validacoes else 0 %}
+                {% set total_aproveitaveis = validacoes|selectattr('creditos_aproveitaveis')|list|length if validacoes else 0 %}
+                {% set total_indevidos = validacoes|selectattr('creditos_indevidos')|list|length if validacoes else 0 %}
+                {% set total_glosaveis = validacoes|selectattr('creditos_glosaveis')|list|length if validacoes else 0 %}
                 
                 <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; border-radius: 10px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                     <div style="font-size: 2em; font-weight: bold; margin-bottom: 5px;">{{ total_docs }}</div>
