@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import List
+from pydantic import BaseModel
 import os
 import tempfile
 import shutil
@@ -28,6 +29,11 @@ from fiscal_auditor import crud, schemas, db_models
 from fiscal_auditor.auth import criar_token_acesso, obter_usuario_atual, verificar_acesso_empresa
 from fiscal_auditor.exportador import ExportadorRelatorios
 from fastapi.responses import FileResponse
+from datalake_integration import (
+    buscar_documentos_periodo,
+    verificar_documentos_disponiveis,
+    obter_estatisticas_datalake
+)
 
 
 class DecimalEncoder(json.JSONEncoder):
@@ -36,6 +42,18 @@ class DecimalEncoder(json.JSONEncoder):
         if isinstance(obj, Decimal):
             return str(obj)
         return super().default(obj)
+
+# Modelos Pydantic para requisições
+class VerificarDatalakeRequest(BaseModel):
+    empresa_id: int
+    data_inicio: str
+    data_fim: str
+
+class ProcessarDatalakeRequest(BaseModel):
+    empresa_id: int
+    data_inicio: str
+    data_fim: str
+    tipo_data: str
 
 # Lifespan event handler
 @asynccontextmanager
@@ -145,6 +163,163 @@ async def home(request: Request, empresa_id: int = None):
         return templates.TemplateResponse("painel.html", {"request": request})
 
 
+@app.post("/api/verificar-datalake")
+async def verificar_datalake(
+    dados: VerificarDatalakeRequest,
+    usuario_atual: schemas.UsuarioResponse = Depends(obter_usuario_atual),
+    db: Session = Depends(get_db)
+):
+    """Verifica quantos documentos existem no datalake para o período."""    
+    try:
+        # Verificar acesso à empresa
+        if not verificar_acesso_empresa(usuario_atual, dados.empresa_id, db):
+            raise HTTPException(status_code=403, detail="Você não tem acesso a esta empresa")
+        
+        # Buscar empresa
+        empresa = crud.obter_empresa(db, dados.empresa_id)
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa não encontrada")
+        
+        # Converter datas
+        from datetime import datetime
+        data_inicio_dt = datetime.strptime(dados.data_inicio, "%Y-%m-%d").date()
+        data_fim_dt = datetime.strptime(dados.data_fim, "%Y-%m-%d").date()
+        
+        # Verificar disponibilidade no datalake
+        resultado = verificar_documentos_disponiveis(
+            cnpj=empresa.cnpj,
+            data_inicio=data_inicio_dt,
+            data_fim=data_fim_dt
+        )
+        
+        return JSONResponse({
+            "success": True,
+            "disponivel": resultado['total'] > 0,
+            "total": resultado['total'],
+            "entradas": resultado['entradas'],
+            "saidas": resultado['saidas']
+        })
+        
+    except Exception as e:
+        return JSONResponse({
+            "success": False,
+            "message": f"Erro ao verificar datalake: {str(e)}"
+        }, status_code=500)
+
+
+@app.post("/processar-datalake")
+async def processar_datalake(
+    dados: ProcessarDatalakeRequest,
+    usuario_atual: schemas.UsuarioResponse = Depends(obter_usuario_atual),
+    db: Session = Depends(get_db)
+):
+    """Processa documentos do datalake (banco de dados do ETL)."""    
+    try:
+        # Verificar acesso à empresa
+        if not verificar_acesso_empresa(usuario_atual, dados.empresa_id, db):
+            raise HTTPException(status_code=403, detail="Você não tem acesso a esta empresa")
+        
+        # Buscar empresa
+        empresa = crud.obter_empresa(db, dados.empresa_id)
+        if not empresa:
+            raise HTTPException(status_code=404, detail="Empresa não encontrada")
+        
+        # Converter datas
+        from datetime import datetime
+        data_inicio_dt = datetime.strptime(dados.data_inicio, "%Y-%m-%d").date()
+        data_fim_dt = datetime.strptime(dados.data_fim, "%Y-%m-%d").date()
+        
+        # Limpar dados anteriores
+        dados_sessao["documentos"] = []
+        dados_sessao["validacoes"] = []
+        dados_sessao["mapa"] = None
+        dados_sessao["relatorios"] = {}
+        dados_sessao["empresa_id"] = dados.empresa_id
+        dados_sessao["filtro_data_tipo"] = dados.tipo_data
+        dados_sessao["filtro_data_inicio"] = dados.data_inicio
+        dados_sessao["filtro_data_fim"] = dados.data_fim
+        dados_sessao["fonte_dados"] = "datalake"
+        
+        # Buscar documentos do datalake
+        documentos = buscar_documentos_periodo(
+            cnpj=empresa.cnpj,
+            data_inicio=data_inicio_dt,
+            data_fim=data_fim_dt,
+            tipo_data=dados.tipo_data,
+            incluir_itens=True
+        )
+        
+        if not documentos:
+            return JSONResponse({
+                "success": False,
+                "message": "Nenhum documento encontrado no datalake para o período selecionado"
+            }, status_code=400)
+        
+        # Inicializar componentes
+        validador = ValidadorTributario()
+        apurador = ApuradorTributario()
+        gerador = GeradorRelatorios()
+        
+        validacoes = []
+        
+        # Processar documentos
+        for doc in documentos:
+            # Validar
+            validacao = validador.validar_documento(doc)
+            validacoes.append(validacao)
+            
+            # Adicionar para apuração
+            apurador.adicionar_documento(doc)
+        
+        # Calcular período
+        datas = [doc.data_emissao for doc in documentos if doc.data_emissao]
+        if datas:
+            data_mais_antiga = min(datas)
+            periodo = f"{data_mais_antiga.month:02d}/{data_mais_antiga.year}"
+        else:
+            data_inicio_obj = datetime.strptime(data_inicio, "%Y-%m-%d")
+            periodo = f"{data_inicio_obj.month:02d}/{data_inicio_obj.year}"
+        
+        # Realizar apuração
+        mapa = apurador.apurar(periodo)
+        
+        # Gerar relatórios
+        relatorios = {
+            "entradas": gerador.gerar_demonstrativo_entradas(documentos),
+            "saidas": gerador.gerar_demonstrativo_saidas(documentos),
+            "mapa": gerador.gerar_mapa_apuracao(mapa),
+            "validacao": gerador.gerar_relatorio_validacao(validacoes),
+            "completo": gerador.gerar_relatorio_completo(documentos, mapa, validacoes)
+        }
+        
+        # Armazenar na sessão
+        dados_sessao["documentos"] = documentos
+        dados_sessao["validacoes"] = validacoes
+        dados_sessao["mapa"] = mapa
+        dados_sessao["relatorios"] = relatorios
+        dados_sessao["empresa"] = {
+            "id": empresa.id,
+            "cnpj": empresa.cnpj,
+            "razao_social": empresa.razao_social
+        }
+        
+        return JSONResponse({
+            "success": True,
+            "message": f"{len(documentos)} documento(s) processado(s) do datalake",
+            "total_documentos": len(documentos),
+            "periodo": periodo,
+            "fonte": "datalake"
+        })
+        
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JSONResponse({
+            "success": False,
+            "message": f"Erro ao processar datalake: {str(e)}"
+        }, status_code=500)
+
+
 @app.post("/upload")
 async def upload_xmls(
     request: Request,
@@ -156,7 +331,7 @@ async def upload_xmls(
     usuario_atual: schemas.UsuarioResponse = Depends(obter_usuario_atual),
     db: Session = Depends(get_db)
 ):
-    """Processa os arquivos XML enviados."""
+    """Processa os arquivos XML enviados (upload manual)."""
     try:
         # Verificar acesso à empresa
         if not verificar_acesso_empresa(usuario_atual, empresa_id, db):
@@ -181,6 +356,7 @@ async def upload_xmls(
         dados_sessao["filtro_data_tipo"] = tipo_data
         dados_sessao["filtro_data_inicio"] = data_inicio
         dados_sessao["filtro_data_fim"] = data_fim
+        dados_sessao["fonte_dados"] = "upload"
         
         # Inicializar componentes
         cnpj_limpo = empresa.cnpj.replace(".", "").replace("/", "").replace("-", "")

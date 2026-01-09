@@ -71,10 +71,19 @@
         {% endif %}
 
         <div class="card">
-            <h2>Upload de Documentos Fiscais</h2>
-            <p>Faça upload dos arquivos XML (NF-e, NFC-e, CT-e, NFS-e) para processamento</p>
+            <h2>Processamento de Documentos Fiscais</h2>
+            <p>Processe documentos do datalake ou faça upload manual de arquivos XML</p>
             
             <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="fonte_dados">Fonte de Dados:</label>
+                    <select id="fonte_dados" name="fonte_dados" required onchange="alterarFonteDados()">
+                        <option value="datalake">Datalake (Documentos Importados)</option>
+                        <option value="upload">Upload Manual de XMLs</option>
+                    </select>
+                    <small id="datalake-info" style="display: none;"></small>
+                </div>
+
                 <div class="form-group">
                     <label for="tipo_data">Filtrar por Data de:</label>
                     <select id="tipo_data" name="tipo_data" required>
@@ -95,11 +104,11 @@
                     <small>Documentos até esta data</small>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="upload-section">
                     <label for="arquivos">Arquivos XML:</label>
                     <div class="file-upload">
                         <input type="file" id="arquivos" name="arquivos" 
-                               accept=".xml" multiple required>
+                               accept=".xml" multiple>
                         <label for="arquivos" class="file-label">
                             <span id="file-chosen">Escolher arquivos XML...</span>
                         </label>
@@ -183,6 +192,85 @@
 
         carregarEmpresa();
 
+        // Função para alternar entre datalake e upload
+        async function alterarFonteDados() {
+            const fonteDados = document.getElementById('fonte_dados').value;
+            const uploadSection = document.getElementById('upload-section');
+            const arquivosInput = document.getElementById('arquivos');
+            const datalakeInfo = document.getElementById('datalake-info');
+            
+            if (fonteDados === 'datalake') {
+                // Esconder seção de upload
+                uploadSection.style.display = 'none';
+                arquivosInput.removeAttribute('required');
+                datalakeInfo.style.display = 'block';
+                
+                // Verificar documentos disponíveis no datalake
+                await verificarDatalake();
+            } else {
+                // Mostrar seção de upload
+                uploadSection.style.display = 'block';
+                arquivosInput.setAttribute('required', 'required');
+                datalakeInfo.style.display = 'none';
+            }
+        }
+
+        // Verificar documentos disponíveis no datalake
+        async function verificarDatalake() {
+            const datalakeInfo = document.getElementById('datalake-info');
+            const dataInicio = document.getElementById('data_inicio').value;
+            const dataFim = document.getElementById('data_fim').value;
+            
+            if (!dataInicio || !dataFim) {
+                datalakeInfo.innerHTML = '<em>Selecione o período para verificar documentos disponíveis</em>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/verificar-datalake', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        empresa_id: parseInt(empresaId),
+                        data_inicio: dataInicio,
+                        data_fim: dataFim
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.disponivel) {
+                    datalakeInfo.innerHTML = `
+                        <strong style="color: #28a745;">✓ ${data.total} documentos disponíveis</strong> 
+                        (${data.entradas} entradas, ${data.saidas} saídas)
+                    `;
+                } else {
+                    datalakeInfo.innerHTML = '<em style="color: #dc3545;">Nenhum documento encontrado no datalake para este período</em>';
+                }
+            } catch (error) {
+                datalakeInfo.innerHTML = '<em style="color: #dc3545;">Erro ao verificar datalake</em>';
+            }
+        }
+
+        // Monitorar mudanças nas datas para atualizar verificação do datalake
+        document.getElementById('data_inicio').addEventListener('change', function() {
+            if (document.getElementById('fonte_dados').value === 'datalake') {
+                verificarDatalake();
+            }
+        });
+        
+        document.getElementById('data_fim').addEventListener('change', function() {
+            if (document.getElementById('fonte_dados').value === 'datalake') {
+                verificarDatalake();
+            }
+        });
+
+        // Inicializar estado da fonte de dados
+        alterarFonteDados();
+
         // Mostrar nome dos arquivos selecionados
         const fileInput = document.getElementById('arquivos');
         const fileChosen = document.getElementById('file-chosen');
@@ -211,9 +299,7 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const formData = new FormData(form);
-            // Adicionar empresa_id ao FormData
-            formData.append('empresa_id', empresaId);
+            const fonteDados = document.getElementById('fonte_dados').value;
             
             // Mostrar loading
             loading.style.display = 'block';
@@ -221,13 +307,40 @@
             submitBtn.disabled = true;
             
             try {
-                const response = await fetch('/upload', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+                let response;
+                
+                if (fonteDados === 'datalake') {
+                    // Processar do datalake
+                    const dataInicio = document.getElementById('data_inicio').value;
+                    const dataFim = document.getElementById('data_fim').value;
+                    const tipoData = document.getElementById('tipo_data').value;
+                    
+                    response = await fetch('/processar-datalake', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            empresa_id: parseInt(empresaId),
+                            data_inicio: dataInicio,
+                            data_fim: dataFim,
+                            tipo_data: tipoData
+                        })
+                    });
+                } else {
+                    // Upload manual
+                    const formData = new FormData(form);
+                    formData.append('empresa_id', empresaId);
+                    
+                    response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                }
                 
                 const data = await response.json();
                 
@@ -237,11 +350,13 @@
                 
                 if (data.success) {
                     result.className = 'result result-success';
+                    const fonte = fonteDados === 'datalake' ? 'Datalake' : 'Upload Manual';
                     result.innerHTML = `
                         <h3>✅ Sucesso!</h3>
+                        <p><strong>Fonte:</strong> ${fonte}</p>
                         <p>${data.message}</p>
                         ${data.erros ? `<p><strong>Avisos:</strong> ${data.erros.join(', ')}</p>` : ''}
-                        <a href="/dashboard" class="btn btn-success">Ver Resultados</a>
+                        <a href="/dashboard?empresa_id=${empresaId}" class="btn btn-success">Ver Resultados</a>
                     `;
                 } else {
                     result.className = 'result result-error';
