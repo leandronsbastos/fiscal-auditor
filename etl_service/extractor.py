@@ -98,6 +98,9 @@ class XMLExtractor:
             # Extrair informações adicionais
             dados['informacoes_adicionais'] = self._extrair_informacoes_adicionais(root)
             
+            # Extrair intermediador
+            dados['intermediador'] = self._extrair_intermediador(root)
+            
             # Extrair protocolo de autorização
             dados['protocolo'] = self._extrair_protocolo(root)
             
@@ -125,6 +128,7 @@ class XMLExtractor:
             'data_saida_entrada': self._parse_datetime(self._get_text(ide, 'nfe:dhSaiEnt', namespaces=self.NAMESPACES)),
             'tipo_operacao': self._get_text(ide, 'nfe:tpNF', namespaces=self.NAMESPACES),
             'codigo_municipio': self._get_text(ide, 'nfe:cMunFG', namespaces=self.NAMESPACES),
+            'codigo_municipio_fg_ibs': self._get_text(ide, 'nfe:cMunFGIBS', namespaces=self.NAMESPACES),  # Município FG IBS/CBS
             'tipo_impressao': self._get_text(ide, 'nfe:tpImp', namespaces=self.NAMESPACES),
             'tipo_emissao': self._get_text(ide, 'nfe:tpEmis', namespaces=self.NAMESPACES),
             'digito_verificador': self._get_text(ide, 'nfe:cDV', namespaces=self.NAMESPACES),
@@ -132,6 +136,7 @@ class XMLExtractor:
             'finalidade_emissao': self._get_text(ide, 'nfe:finNFe', namespaces=self.NAMESPACES),
             'consumidor_final': self._get_text(ide, 'nfe:indFinal', namespaces=self.NAMESPACES),
             'presenca_comprador': self._get_text(ide, 'nfe:indPres', namespaces=self.NAMESPACES),
+            'indicador_intermediador': self._get_text(ide, 'nfe:indIntermed', namespaces=self.NAMESPACES),  # Indicador de intermediador
             'processo_emissao': self._get_text(ide, 'nfe:procEmi', namespaces=self.NAMESPACES),
             'versao_processo': self._get_text(ide, 'nfe:verProc', namespaces=self.NAMESPACES),
         }
@@ -240,7 +245,25 @@ class XMLExtractor:
                     'numero_pedido': self._get_text(prod, 'nfe:xPed', namespaces=self.NAMESPACES),
                     'item_pedido': self._get_text(prod, 'nfe:nItemPed', namespaces=self.NAMESPACES),
                     'numero_fci': self._get_text(prod, 'nfe:nFCI', namespaces=self.NAMESPACES),
+                    # Benefício Fiscal (NT 2021.004)
+                    'codigo_beneficio_fiscal': self._get_text(prod, 'nfe:cBenef', namespaces=self.NAMESPACES),
+                    'codigo_beneficio_fiscal_ibs': self._get_text(prod, 'nfe:cBenefIBS', namespaces=self.NAMESPACES),
+                    # Indicadores
+                    'indicador_escala_relevante': self._get_text(prod, 'nfe:indEscala', namespaces=self.NAMESPACES),
+                    'cnpj_fabricante': self._get_text(prod, 'nfe:CNPJFab', namespaces=self.NAMESPACES),
                 }
+                
+                # Crédito Presumido (NT 2023.002)
+                credito_list = prod.findall('nfe:gCred', self.NAMESPACES)
+                if credito_list:
+                    item['produto']['creditos_presumidos'] = []
+                    for cred in credito_list:
+                        item['produto']['creditos_presumidos'].append({
+                            'codigo': self._get_text(cred, 'nfe:cCredPresumido', namespaces=self.NAMESPACES),
+                            'percentual': self._get_text(cred, 'nfe:pCredPresumido', namespaces=self.NAMESPACES),
+                            'valor': self._get_text(cred, 'nfe:vCredPresumido', namespaces=self.NAMESPACES),
+                            'tipo_ibs_zfm': self._get_text(cred, 'nfe:tpCredPresIBSZFM', namespaces=self.NAMESPACES),
+                        })
                 
                 # DI - Declaração de Importação
                 di_list = prod.findall('nfe:DI', self.NAMESPACES)
@@ -322,6 +345,16 @@ class XMLExtractor:
                     # Crédito SN
                     'percentual_credito_sn': self._get_text(icms_tipo, 'nfe:pCredSN', namespaces=self.NAMESPACES),
                     'valor_credito_sn': self._get_text(icms_tipo, 'nfe:vCredICMSSN', namespaces=self.NAMESPACES),
+                    # ICMS Monofásico (NT 2023.003)
+                    'quantidade_bc_mono': self._get_text(icms_tipo, 'nfe:qBCMono', namespaces=self.NAMESPACES),
+                    'aliquota_adrem_mono': self._get_text(icms_tipo, 'nfe:adRemICMS', namespaces=self.NAMESPACES),
+                    'valor_icms_mono': self._get_text(icms_tipo, 'nfe:vICMSMono', namespaces=self.NAMESPACES),
+                    'quantidade_bc_mono_reten': self._get_text(icms_tipo, 'nfe:qBCMonoReten', namespaces=self.NAMESPACES),
+                    'aliquota_adrem_mono_reten': self._get_text(icms_tipo, 'nfe:adRemICMSReten', namespaces=self.NAMESPACES),
+                    'valor_icms_mono_reten': self._get_text(icms_tipo, 'nfe:vICMSMonoReten', namespaces=self.NAMESPACES),
+                    'quantidade_bc_mono_ret': self._get_text(icms_tipo, 'nfe:qBCMonoRet', namespaces=self.NAMESPACES),
+                    'aliquota_adrem_mono_ret': self._get_text(icms_tipo, 'nfe:adRemICMSRet', namespaces=self.NAMESPACES),
+                    'valor_icms_mono_ret': self._get_text(icms_tipo, 'nfe:vICMSMonoRet', namespaces=self.NAMESPACES),
                 }
         
         # IPI
@@ -384,6 +417,31 @@ class XMLExtractor:
                     'aliquota_reais': self._get_text(cofins_tipo, 'nfe:vAliqProd', namespaces=self.NAMESPACES),
                 }
         
+        # IBS e CBS (Reforma Tributária)
+        ibscbs = imposto.find('nfe:IBSCBS', self.NAMESPACES)
+        if ibscbs is not None:
+            impostos_data['ibscbs'] = {
+                'situacao_tributaria': self._get_text(ibscbs, 'nfe:CST', namespaces=self.NAMESPACES),
+            }
+            
+            # IBS
+            ibs = ibscbs.find('nfe:IBS', self.NAMESPACES)
+            if ibs is not None:
+                impostos_data['ibscbs']['ibs'] = {
+                    'base_calculo': self._get_text(ibs, 'nfe:vBC', namespaces=self.NAMESPACES),
+                    'aliquota': self._get_text(ibs, 'nfe:pAliq', namespaces=self.NAMESPACES),
+                    'valor': self._get_text(ibs, 'nfe:vIBS', namespaces=self.NAMESPACES),
+                }
+            
+            # CBS
+            cbs = ibscbs.find('nfe:CBS', self.NAMESPACES)
+            if cbs is not None:
+                impostos_data['ibscbs']['cbs'] = {
+                    'base_calculo': self._get_text(cbs, 'nfe:vBC', namespaces=self.NAMESPACES),
+                    'aliquota': self._get_text(cbs, 'nfe:pAliq', namespaces=self.NAMESPACES),
+                    'valor': self._get_text(cbs, 'nfe:vCBS', namespaces=self.NAMESPACES),
+                }
+        
         return impostos_data
 
     def _extrair_totais(self, root) -> Dict[str, Any]:
@@ -405,12 +463,21 @@ class XMLExtractor:
             'valor_ipi': self._get_text(total, 'nfe:vIPI', namespaces=self.NAMESPACES),
             'valor_pis': self._get_text(total, 'nfe:vPIS', namespaces=self.NAMESPACES),
             'valor_cofins': self._get_text(total, 'nfe:vCOFINS', namespaces=self.NAMESPACES),
+            'valor_ibs': self._get_text(total, 'nfe:vIBS', namespaces=self.NAMESPACES),
+            'valor_cbs': self._get_text(total, 'nfe:vCBS', namespaces=self.NAMESPACES),
             'valor_outras_despesas': self._get_text(total, 'nfe:vOutro', namespaces=self.NAMESPACES),
             'valor_total_nota': self._get_text(total, 'nfe:vNF', namespaces=self.NAMESPACES),
             'valor_aproximado_tributos': self._get_text(total, 'nfe:vTotTrib', namespaces=self.NAMESPACES),
             'valor_fcp': self._get_text(total, 'nfe:vFCP', namespaces=self.NAMESPACES),
             'valor_fcp_st': self._get_text(total, 'nfe:vFCPST', namespaces=self.NAMESPACES),
             'valor_fcp_st_retido': self._get_text(total, 'nfe:vFCPSTRet', namespaces=self.NAMESPACES),
+            # ICMS Monofásico (NT 2023.003) - Totalizadores
+            'quantidade_bc_mono': self._get_text(total, 'nfe:qBCMono', namespaces=self.NAMESPACES),
+            'valor_icms_mono': self._get_text(total, 'nfe:vICMSMono', namespaces=self.NAMESPACES),
+            'quantidade_bc_mono_reten': self._get_text(total, 'nfe:qBCMonoReten', namespaces=self.NAMESPACES),
+            'valor_icms_mono_reten': self._get_text(total, 'nfe:vICMSMonoReten', namespaces=self.NAMESPACES),
+            'quantidade_bc_mono_ret': self._get_text(total, 'nfe:qBCMonoRet', namespaces=self.NAMESPACES),
+            'valor_icms_mono_ret': self._get_text(total, 'nfe:vICMSMonoRet', namespaces=self.NAMESPACES),
         }
 
     def _extrair_transporte(self, root) -> Dict[str, Any]:
@@ -504,13 +571,26 @@ class XMLExtractor:
         
         data = {'detalhes': []}
         for pag in pagamentos:
-            data['detalhes'].append({
+            detalhe = {
                 'forma': self._get_text(pag, 'nfe:tPag', namespaces=self.NAMESPACES),
                 'valor': self._get_text(pag, 'nfe:vPag', namespaces=self.NAMESPACES),
                 'cnpj_credenciadora': self._get_text(pag, 'nfe:card/nfe:CNPJ', namespaces=self.NAMESPACES),
                 'bandeira': self._get_text(pag, 'nfe:card/nfe:tBand', namespaces=self.NAMESPACES),
                 'autorizacao': self._get_text(pag, 'nfe:card/nfe:cAut', namespaces=self.NAMESPACES),
-            })
+            }
+            
+            # Pagamento Eletrônico (NT 2023.001)
+            card = pag.find('nfe:card', self.NAMESPACES)
+            if card is not None:
+                detalhe['tipo_integracao'] = self._get_text(card, 'nfe:tpIntegra', namespaces=self.NAMESPACES)
+                detalhe['cnpj_recebedor'] = self._get_text(card, 'nfe:CNPJReceb', namespaces=self.NAMESPACES)
+                detalhe['id_terminal'] = self._get_text(card, 'nfe:idTermPag', namespaces=self.NAMESPACES)
+            
+            # Dados do Pagador
+            detalhe['cnpj_pagador'] = self._get_text(pag, 'nfe:CNPJPag', namespaces=self.NAMESPACES)
+            detalhe['uf_pagador'] = self._get_text(pag, 'nfe:UFPag', namespaces=self.NAMESPACES)
+            
+            data['detalhes'].append(detalhe)
         
         # Troco
         troco = root.find('.//nfe:pag/nfe:vTroco', self.NAMESPACES)
@@ -528,6 +608,17 @@ class XMLExtractor:
         return {
             'informacoes_fisco': self._get_text(inf_adic, 'nfe:infAdFisco', namespaces=self.NAMESPACES),
             'informacoes_complementares': self._get_text(inf_adic, 'nfe:infCpl', namespaces=self.NAMESPACES),
+        }
+    
+    def _extrair_intermediador(self, root) -> Dict[str, Any]:
+        """Extrai dados do intermediador da transação (NT 2020.006)."""
+        intermed = root.find('.//nfe:infIntermed', self.NAMESPACES)
+        if intermed is None:
+            return {}
+        
+        return {
+            'cnpj': self._get_text(intermed, 'nfe:CNPJ', namespaces=self.NAMESPACES),
+            'id_cadastro': self._get_text(intermed, 'nfe:idCadIntTran', namespaces=self.NAMESPACES),
         }
 
     def _extrair_protocolo(self, root) -> Dict[str, Any]:

@@ -41,6 +41,19 @@ class NFe(Base):
     tipo_emissao = Column(String(1))  # 1=Normal, 2=Contingência, etc
     tipo_operacao = Column(String(1))  # 0=Entrada, 1=Saída
     finalidade_emissao = Column(String(1))  # 1=Normal, 2=Complementar, 3=Ajuste, 4=Devolução
+    natureza_operacao = Column(String(60))  # Descrição da natureza da operação
+    
+    # Indicadores (NT 2016.002)
+    indicador_presenca = Column(String(1))  # 0=Não se aplica, 1=Operação presencial, etc
+    indicador_final = Column(String(1))  # 0=Normal, 1=Consumidor final
+    indicador_intermediador = Column(String(1))  # 0=Operação sem intermediador, 1=Com intermediador
+    
+    # Município de FG do IBS/CBS (Reforma Tributária)
+    codigo_municipio_fg_ibs = Column(String(10))  # Código IBGE do município de FG do IBS/CBS
+    
+    # Processo de emissão
+    processo_emissao = Column(String(1))  # 0=Emissão própria, 1=Terceiros, etc
+    versao_processo = Column(String(20))  # Versão do aplicativo emissor
     
     # Datas
     data_emissao = Column(DateTime, nullable=False, index=True)
@@ -115,6 +128,18 @@ class NFe(Base):
     valor_pis = Column(Numeric(15, 2))
     valor_cofins = Column(Numeric(15, 2))
     
+    # IBS/CBS (Reforma Tributária)
+    valor_ibs = Column(Numeric(15, 2))
+    valor_cbs = Column(Numeric(15, 2))
+    
+    # ICMS Monofásico (NT 2023.003)
+    quantidade_bc_mono = Column(Numeric(15, 4))  # Quantidade tributada ICMS monofásico próprio
+    valor_icms_mono = Column(Numeric(15, 2))  # Valor ICMS monofásico próprio
+    quantidade_bc_mono_reten = Column(Numeric(15, 4))  # Quantidade tributada ICMS monofásico sujeito a retenção
+    valor_icms_mono_reten = Column(Numeric(15, 2))  # Valor ICMS monofásico sujeito a retenção
+    quantidade_bc_mono_ret = Column(Numeric(15, 4))  # Quantidade tributada ICMS monofásico retido anteriormente
+    valor_icms_mono_ret = Column(Numeric(15, 2))  # Valor ICMS monofásico retido anteriormente
+    
     # Outros
     valor_aproximado_tributos = Column(Numeric(15, 2))
     informacoes_adicionais_fisco = Column(Text)
@@ -145,6 +170,20 @@ class NFe(Base):
     forma_pagamento = Column(String(2))  # 0=À vista, 1=À prazo, etc
     meio_pagamento = Column(String(2))  # 01=Dinheiro, 02=Cheque, 03=Cartão Crédito, etc
     valor_pagamento = Column(Numeric(15, 2))
+    
+    # Pagamento Eletrônico (NT 2023.001)
+    tipo_integracao_pagamento = Column(String(1))  # 1=Integrado, 2=Não integrado
+    cnpj_instituicao_pagamento = Column(String(14))  # CNPJ da credenciadora de cartão/PIX
+    bandeira_operadora = Column(String(2))  # 01=Visa, 02=Mastercard, 99=Outros
+    numero_autorizacao_pagamento = Column(String(128))  # Número de autorização PIX/Cartão
+    cnpj_beneficiario_pagamento = Column(String(14))  # CNPJ do recebedor
+    terminal_pagamento = Column(String(8))  # ID do terminal
+    cnpj_transacional_pagamento = Column(String(14))  # CNPJ transacional
+    uf_pagamento = Column(String(2))  # UF do CNPJ onde pagamento foi processado
+    
+    # Intermediário da Transação (Marketplace - NT 2019.001)
+    cnpj_intermediador = Column(String(14), index=True)  # CNPJ do intermediador (marketplace)
+    identificador_intermediador = Column(String(60))  # ID cadastrado no intermediador
     
     # Cobrança
     numero_fatura = Column(String(20))
@@ -192,6 +231,21 @@ class NFeItem(Base):
     valor_unitario_comercial = Column(Numeric(15, 10))
     valor_total_bruto = Column(Numeric(15, 2))
     codigo_ean_comercial = Column(String(14))
+    
+    # Benefício Fiscal (NT 2021.004)
+    codigo_beneficio_fiscal = Column(String(10))  # Código de benefício fiscal na UF
+    codigo_beneficio_fiscal_ibs = Column(String(10))  # Código de benefício fiscal IBS
+    
+    # Crédito Presumido (NT 2023.002)
+    codigo_credito_presumido = Column(String(3))  # Código de benefício fiscal de crédito presumido
+    percentual_credito_presumido = Column(Numeric(5, 2))  # Percentual do crédito presumido
+    valor_credito_presumido = Column(Numeric(15, 2))  # Valor do crédito presumido
+    tipo_credito_pres_ibs_zfm = Column(String(1))  # Classificação para subapur. IBS na ZFM
+    
+    # Indicadores
+    indicador_escala_relevante = Column(String(1))  # S=Produzido em escala relevante, N=Não
+    cnpj_fabricante = Column(String(14))  # CNPJ do fabricante da mercadoria
+    codigo_beneficio_fiscal_uf = Column(String(10))  # Código de benefício fiscal UF (antigo)
     
     # Unidade tributável
     unidade_tributavel = Column(String(10))
@@ -269,6 +323,17 @@ class NFeItem(Base):
     valor_cofins = Column(Numeric(15, 2))
     quantidade_vendida_cofins = Column(Numeric(15, 4))
     aliquota_cofins_reais = Column(Numeric(15, 4))
+    
+    # IBS (Imposto sobre Bens e Serviços - Reforma Tributária)
+    situacao_tributaria_ibscbs = Column(String(2))
+    base_calculo_ibs = Column(Numeric(15, 2))
+    aliquota_ibs = Column(Numeric(5, 4))
+    valor_ibs = Column(Numeric(15, 2))
+    
+    # CBS (Contribuição sobre Bens e Serviços - Reforma Tributária)
+    base_calculo_cbs = Column(Numeric(15, 2))
+    aliquota_cbs = Column(Numeric(5, 4))
+    valor_cbs = Column(Numeric(15, 2))
     
     # Importação
     numero_di = Column(String(20))  # Declaração de Importação

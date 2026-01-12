@@ -1,0 +1,3272 @@
+{
+  "ide": [
+    {
+      "nome": "cUF",
+      "caminho": "ide/cUF",
+      "tipo": "TCodUfIBGE",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código da UF do emitente do Documento Fiscal. Utilizar a Tabela do IBGE."
+    },
+    {
+      "nome": "cNF",
+      "caminho": "ide/cNF",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código numérico que compõe a Chave de Acesso. Número aleatório gerado pelo emitente para cada NF-e."
+    },
+    {
+      "nome": "natOp",
+      "caminho": "ide/natOp",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Descrição da Natureza da Operação"
+    },
+    {
+      "nome": "mod",
+      "caminho": "ide/mod",
+      "tipo": "TMod",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código do modelo do Documento Fiscal. 55 = NF-e; 65 = NFC-e."
+    },
+    {
+      "nome": "serie",
+      "caminho": "ide/serie",
+      "tipo": "TSerie",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Série do Documento Fiscal\nsérie normal 0-889\nAvulsa Fisco 890-899\nSCAN 900-999"
+    },
+    {
+      "nome": "nNF",
+      "caminho": "ide/nNF",
+      "tipo": "TNF",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do Documento Fiscal"
+    },
+    {
+      "nome": "dhEmi",
+      "caminho": "ide/dhEmi",
+      "tipo": "TDateTimeUTC",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Data e Hora de emissão do Documento Fiscal (AAAA-MM-DDThh:mm:ssTZD) ex.: 2012-09-01T13:00:00-03:00"
+    },
+    {
+      "nome": "dhSaiEnt",
+      "caminho": "ide/dhSaiEnt",
+      "tipo": "TDateTimeUTC",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Data e Hora da saída ou de entrada da mercadoria / produto (AAAA-MM-DDTHH:mm:ssTZD)"
+    },
+    {
+      "nome": "dPrevEntrega",
+      "caminho": "ide/dPrevEntrega",
+      "tipo": "TData",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Data da previsão de entrega ou disponibilização do bem (AAAA-MM-DD)"
+    },
+    {
+      "nome": "tpNF",
+      "caminho": "ide/tpNF",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tipo do Documento Fiscal (0 - entrada; 1 - saída)"
+    },
+    {
+      "nome": "idDest",
+      "caminho": "ide/idDest",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Identificador de Local de destino da operação (1-Interna;2-Interestadual;3-Exterior)"
+    },
+    {
+      "nome": "cMunFG",
+      "caminho": "ide/cMunFG",
+      "tipo": "TCodMunIBGE",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código do Município de Ocorrência do Fato Gerador (utilizar a tabela do IBGE)"
+    },
+    {
+      "nome": "cMunFGIBS",
+      "caminho": "ide/cMunFGIBS",
+      "tipo": "TCodMunIBGE",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informar o município de ocorrência do fato gerador do fato gerador do IBS / CBS.\nCampo preenchido somente quando “indPres = 5 (Operação presencial, fora do estabelecimento) ”, e não tiver endereço do destinatário (Grupo: E05) ou local de entrega (Grupo: G01)."
+    },
+    {
+      "nome": "tpImp",
+      "caminho": "ide/tpImp",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Formato de impressão do DANFE (0-sem DANFE;1-DANFe Retrato; 2-DANFe Paisagem;3-DANFe Simplificado;\n\t\t\t\t\t\t\t\t\t\t\t4-DANFe NFC-e;5-DANFe NFC-e em mensagem eletrônica)"
+    },
+    {
+      "nome": "tpEmis",
+      "caminho": "ide/tpEmis",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Forma de emissão da NF-e\n1 - Normal;\n2 - Contingência FS\n3 - Regime Especial NFF (NT 2021.002)\n4 - Contingência DPEC\n5 - Contingência FSDA\n6 - Contingência SVC - AN\n7 - Contingência SVC - RS\n9 - Contingência off-line NFC-e"
+    },
+    {
+      "nome": "cDV",
+      "caminho": "ide/cDV",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Digito Verificador da Chave de Acesso da NF-e"
+    },
+    {
+      "nome": "tpAmb",
+      "caminho": "ide/tpAmb",
+      "tipo": "TAmb",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Identificação do Ambiente:\n1 - Produção\n2 - Homologação"
+    },
+    {
+      "nome": "finNFe",
+      "caminho": "ide/finNFe",
+      "tipo": "TFinNFe",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Finalidade da emissão da NF-e:\n1 - NFe normal\n2 - NFe complementar\n3 - NFe de ajuste\n4 - Devolução/Retorno\n5 - Nota de crédito\n6 - Nota de débito"
+    },
+    {
+      "nome": "tpNFDebito",
+      "caminho": "ide/tpNFDebito",
+      "tipo": "TTpNFDebito",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Tipo de Nota de Débito"
+    },
+    {
+      "nome": "tpNFCredito",
+      "caminho": "ide/tpNFCredito",
+      "tipo": "TTpNFCredito",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Tipo de Nota de Crédito"
+    },
+    {
+      "nome": "indFinal",
+      "caminho": "ide/indFinal",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indica operação com consumidor final (0-Não;1-Consumidor Final)"
+    },
+    {
+      "nome": "indPres",
+      "caminho": "ide/indPres",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indicador de presença do comprador no estabelecimento comercial no momento da oepração\n\t\t\t\t\t\t\t\t\t\t\t(0-Não se aplica (ex.: Nota Fiscal complementar ou de ajuste;1-Operação presencial;2-Não presencial, internet;3-Não presencial, teleatendimento;4-NFC-e entrega em domicílio;5-Operação presencial, fora do estabelecimento;9-Não presencial, outros)"
+    },
+    {
+      "nome": "indIntermed",
+      "caminho": "ide/indIntermed",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Indicador de intermediador/marketplace \n\t\t\t\t\t\t\t\t\t\t\t0=Operação sem intermediador (em site ou plataforma própria) \n\t\t\t\t\t\t\t\t\t\t\t1=Operação em site ou plataforma de terceiros (intermediadores/marketplace)"
+    },
+    {
+      "nome": "procEmi",
+      "caminho": "ide/procEmi",
+      "tipo": "TProcEmi",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Processo de emissão utilizado com a seguinte codificação:\n0 - emissão de NF-e com aplicativo do contribuinte;\n1 - emissão de NF-e avulsa pelo Fisco;\n2 - emissão de NF-e avulsa, pelo contribuinte com seu certificado digital, através do site\ndo Fisco;\n3- emissão de NF-e pelo contribuinte com aplicativo fornecido pelo Fisco."
+    },
+    {
+      "nome": "verProc",
+      "caminho": "ide/verProc",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "versão do aplicativo utilizado no processo de\nemissão"
+    },
+    {
+      "nome": "NFref",
+      "caminho": "ide/NFref",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Grupo de infromações da NF referenciada"
+    },
+    {
+      "nome": "gCompraGov",
+      "caminho": "ide/gCompraGov",
+      "tipo": "TCompraGov",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de Compras Governamentais"
+    },
+    {
+      "nome": "gPagAntecipado",
+      "caminho": "ide/gPagAntecipado",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informado para abater as parcelas de antecipação de pagamento, conforme Art. 10. § 4º"
+    },
+    {
+      "nome": "refNFe",
+      "caminho": "ide/gPagAntecipado/refNFe",
+      "tipo": "TChNFe",
+      "obrigatorio": true,
+      "multiplo": true,
+      "documentacao": "Chave de acesso da NF-e de antecipação de pagamento"
+    },
+    {
+      "nome": "dhCont",
+      "caminho": "ide/dhCont",
+      "tipo": "TDateTimeUTC",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informar a data e hora de entrada em contingência contingência no formato  (AAAA-MM-DDThh:mm:ssTZD) ex.: 2012-09-01T13:00:00-03:00."
+    },
+    {
+      "nome": "xJust",
+      "caminho": "ide/xJust",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informar a Justificativa da entrada"
+    }
+  ],
+  "emit": [
+    {
+      "nome": "xNome",
+      "caminho": "emit/xNome",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Razão Social ou Nome do emitente"
+    },
+    {
+      "nome": "xFant",
+      "caminho": "emit/xFant",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Nome fantasia"
+    },
+    {
+      "nome": "enderEmit",
+      "caminho": "emit/enderEmit",
+      "tipo": "TEnderEmi",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Endereço do emitente"
+    },
+    {
+      "nome": "IE",
+      "caminho": "emit/IE",
+      "tipo": "TIe",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Inscrição Estadual do Emitente"
+    },
+    {
+      "nome": "IEST",
+      "caminho": "emit/IEST",
+      "tipo": "TIeST",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Inscricao Estadual do Substituto Tributário"
+    },
+    {
+      "nome": "CRT",
+      "caminho": "emit/CRT",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código de Regime Tributário. \nEste campo será obrigatoriamente preenchido com:\n1 – Simples Nacional;\n2 – Simples Nacional – excesso de sublimite de receita bruta;\n3 – Regime Normal.\n4 - Simples Nacional - Microempreendedor individual - MEI"
+    },
+    {
+      "nome": "IM",
+      "caminho": "emit/IM",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Inscrição Municipal"
+    },
+    {
+      "nome": "CNAE",
+      "caminho": "emit/CNAE",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "CNAE Fiscal"
+    },
+    {
+      "nome": "CNPJ",
+      "caminho": "emit/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do CNPJ do emitente"
+    },
+    {
+      "nome": "CPF",
+      "caminho": "emit/CPF",
+      "tipo": "TCpf",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do CPF do emitente"
+    }
+  ],
+  "avulsa": [
+    {
+      "nome": "CNPJ",
+      "caminho": "avulsa/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CNPJ do Órgão emissor"
+    },
+    {
+      "nome": "xOrgao",
+      "caminho": "avulsa/xOrgao",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Órgão emitente"
+    },
+    {
+      "nome": "matr",
+      "caminho": "avulsa/matr",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Matrícula do agente"
+    },
+    {
+      "nome": "xAgente",
+      "caminho": "avulsa/xAgente",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Nome do agente"
+    },
+    {
+      "nome": "fone",
+      "caminho": "avulsa/fone",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Telefone"
+    },
+    {
+      "nome": "UF",
+      "caminho": "avulsa/UF",
+      "tipo": "TUfEmi",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Sigla da Unidade da Federação"
+    },
+    {
+      "nome": "nDAR",
+      "caminho": "avulsa/nDAR",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número do Documento de Arrecadação de Receita"
+    },
+    {
+      "nome": "dEmi",
+      "caminho": "avulsa/dEmi",
+      "tipo": "TData",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Data de emissão do DAR (AAAA-MM-DD)"
+    },
+    {
+      "nome": "vDAR",
+      "caminho": "avulsa/vDAR",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total constante no DAR"
+    },
+    {
+      "nome": "repEmi",
+      "caminho": "avulsa/repEmi",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Repartição Fiscal emitente"
+    },
+    {
+      "nome": "dPag",
+      "caminho": "avulsa/dPag",
+      "tipo": "TData",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Data de pagamento do DAR (AAAA-MM-DD)"
+    }
+  ],
+  "dest": [
+    {
+      "nome": "xNome",
+      "caminho": "dest/xNome",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Razão Social ou nome do destinatário"
+    },
+    {
+      "nome": "enderDest",
+      "caminho": "dest/enderDest",
+      "tipo": "TEndereco",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do endereço"
+    },
+    {
+      "nome": "indIEDest",
+      "caminho": "dest/indIEDest",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indicador da IE do destinatário:\n1 – Contribuinte ICMSpagamento à vista;\n2 – Contribuinte isento de inscrição;\n9 – Não Contribuinte"
+    },
+    {
+      "nome": "IE",
+      "caminho": "dest/IE",
+      "tipo": "TIeDestNaoIsento",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Inscrição Estadual (obrigatório nas operações com contribuintes do ICMS)"
+    },
+    {
+      "nome": "ISUF",
+      "caminho": "dest/ISUF",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Inscrição na SUFRAMA (Obrigatório nas operações com as áreas com benefícios de incentivos fiscais sob controle da SUFRAMA) PL_005d - 11/08/09 - alterado para aceitar 8 ou 9 dígitos"
+    },
+    {
+      "nome": "IM",
+      "caminho": "dest/IM",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Inscrição Municipal do tomador do serviço"
+    },
+    {
+      "nome": "email",
+      "caminho": "dest/email",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informar o e-mail do destinatário. O campo pode ser utilizado para informar o e-mail\nde recepção da NF-e indicada pelo destinatário"
+    },
+    {
+      "nome": "CNPJ",
+      "caminho": "dest/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do CNPJ"
+    },
+    {
+      "nome": "CPF",
+      "caminho": "dest/CPF",
+      "tipo": "TCpf",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do CPF"
+    },
+    {
+      "nome": "idEstrangeiro",
+      "caminho": "dest/idEstrangeiro",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Identificador do destinatário, em caso de comprador estrangeiro"
+    }
+  ],
+  "det": [
+    {
+      "nome": "prod",
+      "caminho": "det/prod",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Dados dos produtos e serviços da NF-e"
+    },
+    {
+      "nome": "cProd",
+      "caminho": "det/prod/cProd",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código do produto ou serviço. Preencher com CFOP caso se trate de itens não relacionados com mercadorias/produto e que o contribuinte não possua codificação própria\nFormato ”CFOP9999”."
+    },
+    {
+      "nome": "cEAN",
+      "caminho": "det/prod/cEAN",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "GTIN (Global Trade Item Number) do produto, antigo código EAN ou código de barras"
+    },
+    {
+      "nome": "cBarra",
+      "caminho": "det/prod/cBarra",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Codigo de barras diferente do padrão GTIN"
+    },
+    {
+      "nome": "xProd",
+      "caminho": "det/prod/xProd",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Descrição do produto ou serviço"
+    },
+    {
+      "nome": "NCM",
+      "caminho": "det/prod/NCM",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código NCM (8 posições), será permitida a informação do gênero (posição do capítulo do NCM) quando a operação não for de comércio exterior (importação/exportação) ou o produto não seja tributado pelo IPI. Em caso de item de serviço ou item que não tenham produto (Ex. transferência de crédito, crédito do ativo imobilizado, etc.), informar o código 00 (zeros) (v2.0)"
+    },
+    {
+      "nome": "NVE",
+      "caminho": "det/prod/NVE",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Nomenclatura de Valor aduaneio e Estatístico"
+    },
+    {
+      "nome": "cBenef",
+      "caminho": "det/prod/cBenef",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "gCred",
+      "caminho": "det/prod/gCred",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Grupo de informações sobre o CréditoPresumido"
+    },
+    {
+      "nome": "cCredPresumido",
+      "caminho": "det/prod/gCred/cCredPresumido",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código de Benefício Fiscal de Crédito Presumido na UF aplicado ao item"
+    },
+    {
+      "nome": "pCredPresumido",
+      "caminho": "det/prod/gCred/pCredPresumido",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Percentual do Crédito Presumido"
+    },
+    {
+      "nome": "vCredPresumido",
+      "caminho": "det/prod/gCred/vCredPresumido",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Crédito Presumido"
+    },
+    {
+      "nome": "tpCredPresIBSZFM",
+      "caminho": "det/prod/tpCredPresIBSZFM",
+      "tipo": "TTpCredPresIBSZFM",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Classificação para subapuração do IBS na ZFM"
+    },
+    {
+      "nome": "EXTIPI",
+      "caminho": "det/prod/EXTIPI",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código EX TIPI (3 posições)"
+    },
+    {
+      "nome": "CFOP",
+      "caminho": "det/prod/CFOP",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Cfop"
+    },
+    {
+      "nome": "uCom",
+      "caminho": "det/prod/uCom",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Unidade comercial"
+    },
+    {
+      "nome": "qCom",
+      "caminho": "det/prod/qCom",
+      "tipo": "TDec_1104v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade Comercial  do produto, alterado para aceitar de 0 a 4 casas decimais e 11 inteiros."
+    },
+    {
+      "nome": "vUnCom",
+      "caminho": "det/prod/vUnCom",
+      "tipo": "TDec_1110v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor unitário de comercialização  - alterado para aceitar 0 a 10 casas decimais e 11 inteiros"
+    },
+    {
+      "nome": "vProd",
+      "caminho": "det/prod/vProd",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor bruto do produto ou serviço."
+    },
+    {
+      "nome": "cEANTrib",
+      "caminho": "det/prod/cEANTrib",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "GTIN (Global Trade Item Number) da unidade tributável, antigo código EAN ou código de barras"
+    },
+    {
+      "nome": "cBarraTrib",
+      "caminho": "det/prod/cBarraTrib",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código de barras da unidade tributável diferente do padrão GTIN"
+    },
+    {
+      "nome": "uTrib",
+      "caminho": "det/prod/uTrib",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Unidade Tributável"
+    },
+    {
+      "nome": "qTrib",
+      "caminho": "det/prod/qTrib",
+      "tipo": "TDec_1104v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade Tributável - alterado para aceitar de 0 a 4 casas decimais e 11 inteiros"
+    },
+    {
+      "nome": "vUnTrib",
+      "caminho": "det/prod/vUnTrib",
+      "tipo": "TDec_1110v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor unitário de tributação - alterado para aceitar 0 a 10 casas decimais e 11 inteiros"
+    },
+    {
+      "nome": "vFrete",
+      "caminho": "det/prod/vFrete",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total do Frete"
+    },
+    {
+      "nome": "vSeg",
+      "caminho": "det/prod/vSeg",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total do Seguro"
+    },
+    {
+      "nome": "vDesc",
+      "caminho": "det/prod/vDesc",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do Desconto"
+    },
+    {
+      "nome": "vOutro",
+      "caminho": "det/prod/vOutro",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Outras despesas acessórias"
+    },
+    {
+      "nome": "indTot",
+      "caminho": "det/prod/indTot",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Este campo deverá ser preenchido com:\n 0 – o valor do item (vProd) não compõe o valor total da NF-e (vProd)\n 1  – o valor do item (vProd) compõe o valor total da NF-e (vProd)"
+    },
+    {
+      "nome": "indBemMovelUsado",
+      "caminho": "det/prod/indBemMovelUsado",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Indicador de fornecimento de bem móvel usado: 1-Bem Móvel Usado"
+    },
+    {
+      "nome": "DI",
+      "caminho": "det/prod/DI",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Declaração de Importação (NT 2011/004)"
+    },
+    {
+      "nome": "nDI",
+      "caminho": "det/prod/DI/nDI",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do Documento de Importação (DI, DSI, DIRE, DUImp) (NT2011/004)"
+    },
+    {
+      "nome": "dDI",
+      "caminho": "det/prod/DI/dDI",
+      "tipo": "TData",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Data de registro da DI/DSI/DA (AAAA-MM-DD)"
+    },
+    {
+      "nome": "xLocDesemb",
+      "caminho": "det/prod/DI/xLocDesemb",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Local do desembaraço aduaneiro"
+    },
+    {
+      "nome": "UFDesemb",
+      "caminho": "det/prod/DI/UFDesemb",
+      "tipo": "TUfEmi",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "UF onde ocorreu o desembaraço aduaneiro"
+    },
+    {
+      "nome": "dDesemb",
+      "caminho": "det/prod/DI/dDesemb",
+      "tipo": "TData",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Data do desembaraço aduaneiro (AAAA-MM-DD)"
+    },
+    {
+      "nome": "tpViaTransp",
+      "caminho": "det/prod/DI/tpViaTransp",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Via de transporte internacional informada na DI ou na Declaração Única de Importação (DUImp):\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t1-Maritima;2-Fluvial;3-Lacustre;4-Aerea;5-Postal;6-Ferroviaria;7-Rodoviaria;8-Conduto;9-Meios Proprios;10-Entrada/Saida Ficta;\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t11-Courier;12-Em maos;13-Por reboque."
+    },
+    {
+      "nome": "vAFRMM",
+      "caminho": "det/prod/DI/vAFRMM",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Adicional ao frete para renovação de marinha mercante"
+    },
+    {
+      "nome": "tpIntermedio",
+      "caminho": "det/prod/DI/tpIntermedio",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Forma de Importação quanto a intermediação \n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t1-por conta propria;2-por conta e ordem;3-encomenda"
+    },
+    {
+      "nome": "UFTerceiro",
+      "caminho": "det/prod/DI/UFTerceiro",
+      "tipo": "TUfEmi",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Sigla da UF do adquirente ou do encomendante"
+    },
+    {
+      "nome": "cExportador",
+      "caminho": "det/prod/DI/cExportador",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código do exportador (usado nos sistemas internos de informação do emitente da NF-e)"
+    },
+    {
+      "nome": "adi",
+      "caminho": "det/prod/DI/adi",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": true,
+      "documentacao": "Adições (NT 2011/004)"
+    },
+    {
+      "nome": "nAdicao",
+      "caminho": "det/prod/DI/adi/nAdicao",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número da Adição"
+    },
+    {
+      "nome": "nSeqAdic",
+      "caminho": "det/prod/DI/adi/nSeqAdic",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número seqüencial do item"
+    },
+    {
+      "nome": "cFabricante",
+      "caminho": "det/prod/DI/adi/cFabricante",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código do fabricante estrangeiro (usado nos sistemas internos de informação do emitente da NF-e)"
+    },
+    {
+      "nome": "vDescDI",
+      "caminho": "det/prod/DI/adi/vDescDI",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do desconto do item"
+    },
+    {
+      "nome": "nDraw",
+      "caminho": "det/prod/DI/adi/nDraw",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número do ato concessório de Drawback"
+    },
+    {
+      "nome": "CNPJ",
+      "caminho": "det/prod/DI/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CNPJ do adquirente ou do encomendante"
+    },
+    {
+      "nome": "CPF",
+      "caminho": "det/prod/DI/CPF",
+      "tipo": "TCpf",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CPF do adquirente ou do encomendante"
+    },
+    {
+      "nome": "detExport",
+      "caminho": "det/prod/detExport",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Detalhe da exportação"
+    },
+    {
+      "nome": "nDraw",
+      "caminho": "det/prod/detExport/nDraw",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número do ato concessório de Drawback"
+    },
+    {
+      "nome": "exportInd",
+      "caminho": "det/prod/detExport/exportInd",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Exportação indireta"
+    },
+    {
+      "nome": "nRE",
+      "caminho": "det/prod/detExport/exportInd/nRE",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Registro de exportação"
+    },
+    {
+      "nome": "chNFe",
+      "caminho": "det/prod/detExport/exportInd/chNFe",
+      "tipo": "TChNFe",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Chave de acesso da NF-e recebida para exportação"
+    },
+    {
+      "nome": "qExport",
+      "caminho": "det/prod/detExport/exportInd/qExport",
+      "tipo": "TDec_1104v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade do item efetivamente exportado"
+    },
+    {
+      "nome": "xPed",
+      "caminho": "det/prod/xPed",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "pedido de compra - Informação de interesse do emissor para controle do B2B."
+    },
+    {
+      "nome": "nItemPed",
+      "caminho": "det/prod/nItemPed",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número do Item do Pedido de Compra - Identificação do número do item do pedido de Compra"
+    },
+    {
+      "nome": "nFCI",
+      "caminho": "det/prod/nFCI",
+      "tipo": "TGuid",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número de controle da FCI - Ficha de Conteúdo de Importação."
+    },
+    {
+      "nome": "rastro",
+      "caminho": "det/prod/rastro",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": ""
+    },
+    {
+      "nome": "nLote",
+      "caminho": "det/prod/rastro/nLote",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do lote do produto."
+    },
+    {
+      "nome": "qLote",
+      "caminho": "det/prod/rastro/qLote",
+      "tipo": "TDec_0803v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade de produto no lote."
+    },
+    {
+      "nome": "dFab",
+      "caminho": "det/prod/rastro/dFab",
+      "tipo": "TData",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Data de fabricação/produção. Formato \"AAAA-MM-DD\"."
+    },
+    {
+      "nome": "dVal",
+      "caminho": "det/prod/rastro/dVal",
+      "tipo": "TData",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Data de validade. Informar o último dia do mês caso a validade não especifique o dia. Formato \"AAAA-MM-DD\"."
+    },
+    {
+      "nome": "cAgreg",
+      "caminho": "det/prod/rastro/cAgreg",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "infProdNFF",
+      "caminho": "det/prod/infProdNFF",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informações mais detalhadas do produto (usada na NFF)"
+    },
+    {
+      "nome": "cProdFisco",
+      "caminho": "det/prod/infProdNFF/cProdFisco",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código Fiscal do Produto"
+    },
+    {
+      "nome": "cOperNFF",
+      "caminho": "det/prod/infProdNFF/cOperNFF",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código da operação selecionada na NFF e relacionada ao item"
+    },
+    {
+      "nome": "infProdEmb",
+      "caminho": "det/prod/infProdEmb",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informações mais detalhadas do produto (usada na NFF)"
+    },
+    {
+      "nome": "xEmb",
+      "caminho": "det/prod/infProdEmb/xEmb",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Embalagem do produto"
+    },
+    {
+      "nome": "qVolEmb",
+      "caminho": "det/prod/infProdEmb/qVolEmb",
+      "tipo": "TDec_0803v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Volume do produto na embalagem"
+    },
+    {
+      "nome": "uEmb",
+      "caminho": "det/prod/infProdEmb/uEmb",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Unidade de Medida da Embalagem"
+    },
+    {
+      "nome": "CEST",
+      "caminho": "det/prod/CEST",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Codigo especificador da Substuicao Tributaria - CEST, que identifica a mercadoria sujeita aos regimes de  substituicao tributária e de antecipação do recolhimento  do imposto"
+    },
+    {
+      "nome": "indEscala",
+      "caminho": "det/prod/indEscala",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "CNPJFab",
+      "caminho": "det/prod/CNPJFab",
+      "tipo": "TCnpj",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "CNPJ do Fabricante da Mercadoria, obrigatório para produto em escala NÃO relevante."
+    },
+    {
+      "nome": "veicProd",
+      "caminho": "det/prod/veicProd",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Veículos novos"
+    },
+    {
+      "nome": "tpOp",
+      "caminho": "det/prod/veicProd/tpOp",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tipo da Operação (1 - Venda concessionária; 2 - Faturamento direto; 3 - Venda direta; 0 - Outros)"
+    },
+    {
+      "nome": "chassi",
+      "caminho": "det/prod/veicProd/chassi",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Chassi do veículo - VIN (código-identificação-veículo)"
+    },
+    {
+      "nome": "cCor",
+      "caminho": "det/prod/veicProd/cCor",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Cor do veículo (código de cada montadora)"
+    },
+    {
+      "nome": "xCor",
+      "caminho": "det/prod/veicProd/xCor",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Descrição da cor"
+    },
+    {
+      "nome": "pot",
+      "caminho": "det/prod/veicProd/pot",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Potência máxima do motor do veículo em cavalo vapor (CV). (potência-veículo)"
+    },
+    {
+      "nome": "cilin",
+      "caminho": "det/prod/veicProd/cilin",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Capacidade voluntária do motor expressa em centímetros cúbicos (CC). (cilindradas)"
+    },
+    {
+      "nome": "pesoL",
+      "caminho": "det/prod/veicProd/pesoL",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Peso líquido"
+    },
+    {
+      "nome": "pesoB",
+      "caminho": "det/prod/veicProd/pesoB",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Peso bruto"
+    },
+    {
+      "nome": "nSerie",
+      "caminho": "det/prod/veicProd/nSerie",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Serial (série)"
+    },
+    {
+      "nome": "tpComb",
+      "caminho": "det/prod/veicProd/tpComb",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tipo de combustível-Tabela RENAVAM: 01-Álcool; 02-Gasolina; 03-Diesel; 16-Álcool/Gas.; 17-Gas./Álcool/GNV; 18-Gasolina/Elétrico"
+    },
+    {
+      "nome": "nMotor",
+      "caminho": "det/prod/veicProd/nMotor",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do motor"
+    },
+    {
+      "nome": "CMT",
+      "caminho": "det/prod/veicProd/CMT",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CMT-Capacidade Máxima de Tração - em Toneladas 4 casas decimais"
+    },
+    {
+      "nome": "dist",
+      "caminho": "det/prod/veicProd/dist",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Distância entre eixos"
+    },
+    {
+      "nome": "anoMod",
+      "caminho": "det/prod/veicProd/anoMod",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Ano Modelo de Fabricação"
+    },
+    {
+      "nome": "anoFab",
+      "caminho": "det/prod/veicProd/anoFab",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Ano de Fabricação"
+    },
+    {
+      "nome": "tpPint",
+      "caminho": "det/prod/veicProd/tpPint",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tipo de pintura"
+    },
+    {
+      "nome": "tpVeic",
+      "caminho": "det/prod/veicProd/tpVeic",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tipo de veículo (utilizar tabela RENAVAM)"
+    },
+    {
+      "nome": "espVeic",
+      "caminho": "det/prod/veicProd/espVeic",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Espécie de veículo (utilizar tabela RENAVAM)"
+    },
+    {
+      "nome": "VIN",
+      "caminho": "det/prod/veicProd/VIN",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informa-se o veículo tem VIN (chassi) remarcado.\nR-Remarcado\nN-NormalVIN"
+    },
+    {
+      "nome": "condVeic",
+      "caminho": "det/prod/veicProd/condVeic",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Condição do veículo (1 - acabado; 2 - inacabado; 3 - semi-acabado)"
+    },
+    {
+      "nome": "cMod",
+      "caminho": "det/prod/veicProd/cMod",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código Marca Modelo (utilizar tabela RENAVAM)"
+    },
+    {
+      "nome": "cCorDENATRAN",
+      "caminho": "det/prod/veicProd/cCorDENATRAN",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código da Cor Segundo as regras de pré-cadastro do DENATRAN: 01-AMARELO;02-AZUL;03-BEGE;04-BRANCA;05-CINZA;06-DOURADA;07-GRENA \n08-LARANJA;09-MARROM;10-PRATA;11-PRETA;12-ROSA;13-ROXA;14-VERDE;15-VERMELHA;16-FANTASIA"
+    },
+    {
+      "nome": "lota",
+      "caminho": "det/prod/veicProd/lota",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade máxima de permitida de passageiros sentados, inclusive motorista."
+    },
+    {
+      "nome": "tpRest",
+      "caminho": "det/prod/veicProd/tpRest",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Restrição\n0 - Não há;\n1 - Alienação Fiduciária;\n2 - Arrendamento Mercantil;\n3 - Reserva de Domínio;\n4 - Penhor de Veículos;\n9 - outras."
+    },
+    {
+      "nome": "med",
+      "caminho": "det/prod/med",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "grupo do detalhamento de Medicamentos e de matérias-primas farmacêuticas"
+    },
+    {
+      "nome": "cProdANVISA",
+      "caminho": "det/prod/med/cProdANVISA",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Utilizar o número do registro ANVISA  ou preencher com o literal “ISENTO”, no caso de medicamento isento de registro na ANVISA."
+    },
+    {
+      "nome": "xMotivoIsencao",
+      "caminho": "det/prod/med/xMotivoIsencao",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Obs.: Para medicamento isento de registro na ANVISA, informar o número da decisão que o isenta, como por exemplo o número da Resolução da Diretoria Colegiada da ANVISA (RDC)."
+    },
+    {
+      "nome": "vPMC",
+      "caminho": "det/prod/med/vPMC",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Preço Máximo ao Consumidor."
+    },
+    {
+      "nome": "arma",
+      "caminho": "det/prod/arma",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": true,
+      "documentacao": "Armamentos"
+    },
+    {
+      "nome": "tpArma",
+      "caminho": "det/prod/arma/tpArma",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indicador do tipo de arma de fogo (0 - Uso permitido; 1 - Uso restrito)"
+    },
+    {
+      "nome": "nSerie",
+      "caminho": "det/prod/arma/nSerie",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número de série da arma"
+    },
+    {
+      "nome": "nCano",
+      "caminho": "det/prod/arma/nCano",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número de série do cano"
+    },
+    {
+      "nome": "descr",
+      "caminho": "det/prod/arma/descr",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Descrição completa da arma, compreendendo: calibre, marca, capacidade, tipo de funcionamento, comprimento e demais elementos que permitam a sua perfeita identificação."
+    },
+    {
+      "nome": "comb",
+      "caminho": "det/prod/comb",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informar apenas para operações com combustíveis líquidos"
+    },
+    {
+      "nome": "cProdANP",
+      "caminho": "det/prod/comb/cProdANP",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código de produto da ANP. codificação de produtos do SIMP (http://www.anp.gov.br)"
+    },
+    {
+      "nome": "descANP",
+      "caminho": "det/prod/comb/descANP",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Descrição do Produto conforme ANP. Utilizar a descrição de produtos do Sistema de Informações de Movimentação de Produtos - SIMP (http://www.anp.gov.br/simp/)."
+    },
+    {
+      "nome": "pGLP",
+      "caminho": "det/prod/comb/pGLP",
+      "tipo": "TDec_0302a04Max100",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Percentual do GLP derivado do petróleo no produto GLP (cProdANP=210203001). Informar em número decimal o percentual do GLP derivado de petróleo no produto GLP. Valores 0 a 100."
+    },
+    {
+      "nome": "pGNn",
+      "caminho": "det/prod/comb/pGNn",
+      "tipo": "TDec_0302a04Max100",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Percentual de gás natural nacional - GLGNn para o produto GLP (cProdANP=210203001). Informar em número decimal o percentual do Gás Natural Nacional - GLGNn para o produto GLP. Valores de 0 a 100."
+    },
+    {
+      "nome": "pGNi",
+      "caminho": "det/prod/comb/pGNi",
+      "tipo": "TDec_0302a04Max100",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Percentual de gás natural importado GLGNi para o produto GLP (cProdANP=210203001). Informar em número deciaml o percentual do Gás Natural Importado - GLGNi para o produto GLP. Valores de 0 a 100."
+    },
+    {
+      "nome": "vPart",
+      "caminho": "det/prod/comb/vPart",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor de partida (cProdANP=210203001). Deve ser informado neste campo o valor por quilograma sem ICMS."
+    },
+    {
+      "nome": "CODIF",
+      "caminho": "det/prod/comb/CODIF",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código de autorização / registro do CODIF. Informar apenas quando a UF utilizar o CODIF (Sistema de Controle do \t\t\tDiferimento do Imposto nas Operações com AEAC - Álcool Etílico Anidro Combustível)."
+    },
+    {
+      "nome": "qTemp",
+      "caminho": "det/prod/comb/qTemp",
+      "tipo": "TDec_1204temperatura",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Quantidade de combustível\nfaturada à temperatura ambiente.\nInformar quando a quantidade\nfaturada informada no campo\nqCom (I10) tiver sido ajustada para\numa temperatura diferente da\nambiente."
+    },
+    {
+      "nome": "UFCons",
+      "caminho": "det/prod/comb/UFCons",
+      "tipo": "TUf",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Sigla da UF de Consumo"
+    },
+    {
+      "nome": "CIDE",
+      "caminho": "det/prod/comb/CIDE",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "CIDE Combustíveis"
+    },
+    {
+      "nome": "qBCProd",
+      "caminho": "det/prod/comb/CIDE/qBCProd",
+      "tipo": "TDec_1204v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "BC do CIDE ( Quantidade comercializada)"
+    },
+    {
+      "nome": "vAliqProd",
+      "caminho": "det/prod/comb/CIDE/vAliqProd",
+      "tipo": "TDec_1104",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota do CIDE  (em reais)"
+    },
+    {
+      "nome": "vCIDE",
+      "caminho": "det/prod/comb/CIDE/vCIDE",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do CIDE"
+    },
+    {
+      "nome": "encerrante",
+      "caminho": "det/prod/comb/encerrante",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informações do grupo de \"encerrante\""
+    },
+    {
+      "nome": "nBico",
+      "caminho": "det/prod/comb/encerrante/nBico",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Numero de identificação do Bico utilizado no abastecimento"
+    },
+    {
+      "nome": "nBomba",
+      "caminho": "det/prod/comb/encerrante/nBomba",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Numero de identificação da bomba ao qual o bico está interligado"
+    },
+    {
+      "nome": "nTanque",
+      "caminho": "det/prod/comb/encerrante/nTanque",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Numero de identificação do tanque ao qual o bico está interligado"
+    },
+    {
+      "nome": "vEncIni",
+      "caminho": "det/prod/comb/encerrante/vEncIni",
+      "tipo": "TDec_1203",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Encerrante no ínicio do abastecimento"
+    },
+    {
+      "nome": "vEncFin",
+      "caminho": "det/prod/comb/encerrante/vEncFin",
+      "tipo": "TDec_1203",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Encerrante no final do abastecimento"
+    },
+    {
+      "nome": "pBio",
+      "caminho": "det/prod/comb/pBio",
+      "tipo": "TDec_03v00a04Max100Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Percentual do índice de mistura do Biodiesel (B100) no Óleo Diesel B instituído pelo órgão regulamentador"
+    },
+    {
+      "nome": "origComb",
+      "caminho": "det/prod/comb/origComb",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Grupo indicador da origem do combustível"
+    },
+    {
+      "nome": "indImport",
+      "caminho": "det/prod/comb/origComb/indImport",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indicador de importação 0=Nacional; 1=Importado;"
+    },
+    {
+      "nome": "cUFOrig",
+      "caminho": "det/prod/comb/origComb/cUFOrig",
+      "tipo": "TCodUfIBGE",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "UF de origem do produtor ou do importado"
+    },
+    {
+      "nome": "pOrig",
+      "caminho": "det/prod/comb/origComb/pOrig",
+      "tipo": "TDec_03v00a04Max100Opc",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Percentual originário para a UF"
+    },
+    {
+      "nome": "nRECOPI",
+      "caminho": "det/prod/nRECOPI",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número do RECOPI"
+    },
+    {
+      "nome": "imposto",
+      "caminho": "det/imposto",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tributos incidentes nos produtos ou serviços da NF-e"
+    },
+    {
+      "nome": "vTotTrib",
+      "caminho": "det/imposto/vTotTrib",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor estimado total de impostos federais, estaduais e municipais"
+    },
+    {
+      "nome": "PIS",
+      "caminho": "det/imposto/PIS",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do PIS"
+    },
+    {
+      "nome": "PISST",
+      "caminho": "det/imposto/PISST",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do PIS Substituição Tributária"
+    },
+    {
+      "nome": "vPIS",
+      "caminho": "det/imposto/PISST/vPIS",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do PIS ST"
+    },
+    {
+      "nome": "indSomaPISST",
+      "caminho": "det/imposto/PISST/indSomaPISST",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Indica se o valor do PISST compõe o valor total da NF-e"
+    },
+    {
+      "nome": "vBC",
+      "caminho": "det/imposto/PISST/vBC",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor da BC do PIS ST"
+    },
+    {
+      "nome": "pPIS",
+      "caminho": "det/imposto/PISST/pPIS",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota do PIS ST (em percentual)"
+    },
+    {
+      "nome": "qBCProd",
+      "caminho": "det/imposto/PISST/qBCProd",
+      "tipo": "TDec_1204",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade Vendida"
+    },
+    {
+      "nome": "vAliqProd",
+      "caminho": "det/imposto/PISST/vAliqProd",
+      "tipo": "TDec_1104",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota do PIS ST (em reais)"
+    },
+    {
+      "nome": "COFINS",
+      "caminho": "det/imposto/COFINS",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do COFINS"
+    },
+    {
+      "nome": "COFINSST",
+      "caminho": "det/imposto/COFINSST",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do COFINS da\nSubstituição Tributaria;"
+    },
+    {
+      "nome": "vCOFINS",
+      "caminho": "det/imposto/COFINSST/vCOFINS",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do COFINS ST"
+    },
+    {
+      "nome": "indSomaCOFINSST",
+      "caminho": "det/imposto/COFINSST/indSomaCOFINSST",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Indica se o valor da COFINS ST compõe o valor total da NFe"
+    },
+    {
+      "nome": "vBC",
+      "caminho": "det/imposto/COFINSST/vBC",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor da BC do COFINS ST"
+    },
+    {
+      "nome": "pCOFINS",
+      "caminho": "det/imposto/COFINSST/pCOFINS",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota do COFINS ST(em percentual)"
+    },
+    {
+      "nome": "qBCProd",
+      "caminho": "det/imposto/COFINSST/qBCProd",
+      "tipo": "TDec_1204",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade Vendida"
+    },
+    {
+      "nome": "vAliqProd",
+      "caminho": "det/imposto/COFINSST/vAliqProd",
+      "tipo": "TDec_1104",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota do COFINS ST(em reais)"
+    },
+    {
+      "nome": "ICMSUFDest",
+      "caminho": "det/imposto/ICMSUFDest",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo a ser informado nas vendas interestarduais para consumidor final, não contribuinte de ICMS"
+    },
+    {
+      "nome": "vBCUFDest",
+      "caminho": "det/imposto/ICMSUFDest/vBCUFDest",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor da Base de Cálculo do ICMS na UF do destinatário."
+    },
+    {
+      "nome": "vBCFCPUFDest",
+      "caminho": "det/imposto/ICMSUFDest/vBCFCPUFDest",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor da Base de Cálculo do FCP na UF do destinatário."
+    },
+    {
+      "nome": "pFCPUFDest",
+      "caminho": "det/imposto/ICMSUFDest/pFCPUFDest",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Percentual adicional inserido na alíquota interna da UF de destino, relativo ao Fundo de Combate à Pobreza (FCP) naquela UF."
+    },
+    {
+      "nome": "pICMSUFDest",
+      "caminho": "det/imposto/ICMSUFDest/pICMSUFDest",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota adotada nas operações internas na UF do destinatário para o produto / mercadoria."
+    },
+    {
+      "nome": "pICMSInter",
+      "caminho": "det/imposto/ICMSUFDest/pICMSInter",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota interestadual das UF envolvidas: - 4% alíquota interestadual para produtos importados; - 7% para os Estados de origem do Sul e Sudeste (exceto ES), destinado para os Estados do Norte e Nordeste  ou ES; - 12% para os demais casos."
+    },
+    {
+      "nome": "pICMSInterPart",
+      "caminho": "det/imposto/ICMSUFDest/pICMSInterPart",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Percentual de partilha para a UF do destinatário: - 40% em 2016; - 60% em 2017; - 80% em 2018; - 100% a partir de 2019."
+    },
+    {
+      "nome": "vFCPUFDest",
+      "caminho": "det/imposto/ICMSUFDest/vFCPUFDest",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do ICMS relativo ao Fundo de Combate à Pobreza (FCP) da UF de destino."
+    },
+    {
+      "nome": "vICMSUFDest",
+      "caminho": "det/imposto/ICMSUFDest/vICMSUFDest",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do ICMS de partilha para a UF do destinatário."
+    },
+    {
+      "nome": "vICMSUFRemet",
+      "caminho": "det/imposto/ICMSUFDest/vICMSUFRemet",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do ICMS de partilha para a UF do remetente. Nota: A partir de 2019, este valor será zero."
+    },
+    {
+      "nome": "IS",
+      "caminho": "det/imposto/IS",
+      "tipo": "TIS",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de informações do Imposto Seletivo"
+    },
+    {
+      "nome": "IBSCBS",
+      "caminho": "det/imposto/IBSCBS",
+      "tipo": "TTribNFe",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de informações dos tributos IBS, CBS e Imposto Seletivo"
+    },
+    {
+      "nome": "ICMS",
+      "caminho": "det/imposto/ICMS",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Dados do ICMS Normal e ST"
+    },
+    {
+      "nome": "IPI",
+      "caminho": "det/imposto/IPI",
+      "tipo": "TIpi",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "II",
+      "caminho": "det/imposto/II",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do Imposto de Importação"
+    },
+    {
+      "nome": "vBC",
+      "caminho": "det/imposto/II/vBC",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Base da BC do Imposto de Importação"
+    },
+    {
+      "nome": "vDespAdu",
+      "caminho": "det/imposto/II/vDespAdu",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor das despesas aduaneiras"
+    },
+    {
+      "nome": "vII",
+      "caminho": "det/imposto/II/vII",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Imposto de Importação"
+    },
+    {
+      "nome": "vIOF",
+      "caminho": "det/imposto/II/vIOF",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Imposto sobre Operações Financeiras"
+    },
+    {
+      "nome": "IPI",
+      "caminho": "det/imposto/IPI",
+      "tipo": "TIpi",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "ISSQN",
+      "caminho": "det/imposto/ISSQN",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "ISSQN"
+    },
+    {
+      "nome": "vBC",
+      "caminho": "det/imposto/ISSQN/vBC",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor da BC do ISSQN"
+    },
+    {
+      "nome": "vAliq",
+      "caminho": "det/imposto/ISSQN/vAliq",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota do ISSQN"
+    },
+    {
+      "nome": "vISSQN",
+      "caminho": "det/imposto/ISSQN/vISSQN",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor da do ISSQN"
+    },
+    {
+      "nome": "cMunFG",
+      "caminho": "det/imposto/ISSQN/cMunFG",
+      "tipo": "TCodMunIBGE",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informar o município de ocorrência do fato gerador do ISSQN. Utilizar a Tabela do IBGE (Anexo VII - Tabela de UF, Município e País). “Atenção, não vincular com os campos B12, C10 ou E10” v2.0"
+    },
+    {
+      "nome": "cListServ",
+      "caminho": "det/imposto/ISSQN/cListServ",
+      "tipo": "TCListServ",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informar o Item da lista de serviços da LC 116/03 em que se classifica o serviço."
+    },
+    {
+      "nome": "vDeducao",
+      "caminho": "det/imposto/ISSQN/vDeducao",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor dedução para redução da base de cálculo"
+    },
+    {
+      "nome": "vOutro",
+      "caminho": "det/imposto/ISSQN/vOutro",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor outras retenções"
+    },
+    {
+      "nome": "vDescIncond",
+      "caminho": "det/imposto/ISSQN/vDescIncond",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor desconto incondicionado"
+    },
+    {
+      "nome": "vDescCond",
+      "caminho": "det/imposto/ISSQN/vDescCond",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor desconto condicionado"
+    },
+    {
+      "nome": "vISSRet",
+      "caminho": "det/imposto/ISSQN/vISSRet",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Retenção ISS"
+    },
+    {
+      "nome": "indISS",
+      "caminho": "det/imposto/ISSQN/indISS",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Exibilidade do ISS:1-Exigível;2-Não incidente;3-Isenção;4-Exportação;5-Imunidade;6-Exig.Susp. Judicial;7-Exig.Susp. ADM"
+    },
+    {
+      "nome": "cServico",
+      "caminho": "det/imposto/ISSQN/cServico",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código do serviço prestado dentro do município"
+    },
+    {
+      "nome": "cMun",
+      "caminho": "det/imposto/ISSQN/cMun",
+      "tipo": "TCodMunIBGE",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código do Município de Incidência do Imposto"
+    },
+    {
+      "nome": "cPais",
+      "caminho": "det/imposto/ISSQN/cPais",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código de Pais"
+    },
+    {
+      "nome": "nProcesso",
+      "caminho": "det/imposto/ISSQN/nProcesso",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número do Processo administrativo ou judicial de suspenção do processo"
+    },
+    {
+      "nome": "indIncentivo",
+      "caminho": "det/imposto/ISSQN/indIncentivo",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indicador de Incentivo Fiscal. 1=Sim; 2=Não"
+    },
+    {
+      "nome": "impostoDevol",
+      "caminho": "det/impostoDevol",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "pDevol",
+      "caminho": "det/impostoDevol/pDevol",
+      "tipo": "TDec_0302Max100",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Percentual de mercadoria devolvida"
+    },
+    {
+      "nome": "IPI",
+      "caminho": "det/impostoDevol/IPI",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Informação de IPI devolvido"
+    },
+    {
+      "nome": "vIPIDevol",
+      "caminho": "det/impostoDevol/IPI/vIPIDevol",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do IPI devolvido"
+    },
+    {
+      "nome": "infAdProd",
+      "caminho": "det/infAdProd",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informações adicionais do produto (norma referenciada, informações complementares, etc)"
+    },
+    {
+      "nome": "obsItem",
+      "caminho": "det/obsItem",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de observações de uso livre (para o item da NF-e)"
+    },
+    {
+      "nome": "obsCont",
+      "caminho": "det/obsItem/obsCont",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de observações de uso livre (para o item da NF-e)"
+    },
+    {
+      "nome": "xTexto",
+      "caminho": "det/obsItem/obsCont/xTexto",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "obsFisco",
+      "caminho": "det/obsItem/obsFisco",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de observações de uso livre (para o item da NF-e)"
+    },
+    {
+      "nome": "xTexto",
+      "caminho": "det/obsItem/obsFisco/xTexto",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "vItem",
+      "caminho": "det/vItem",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total do Item, correspondente à sua participação no total da nota. A soma dos itens deverá corresponder ao total da nota."
+    },
+    {
+      "nome": "DFeReferenciado",
+      "caminho": "det/DFeReferenciado",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Referenciamento de item de outros DFe"
+    },
+    {
+      "nome": "chaveAcesso",
+      "caminho": "det/DFeReferenciado/chaveAcesso",
+      "tipo": "TChNFe",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Chave de Acesso do DFe referenciado"
+    },
+    {
+      "nome": "nItem",
+      "caminho": "det/DFeReferenciado/nItem",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número do item do documento referenciado. Corresponde ao atributo nItem do elemento det do documento original."
+    }
+  ],
+  "total": [
+    {
+      "nome": "ICMSTot",
+      "caminho": "total/ICMSTot",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Totais referentes ao ICMS"
+    },
+    {
+      "nome": "vBC",
+      "caminho": "total/ICMSTot/vBC",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "BC do ICMS"
+    },
+    {
+      "nome": "vICMS",
+      "caminho": "total/ICMSTot/vICMS",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do ICMS"
+    },
+    {
+      "nome": "vICMSDeson",
+      "caminho": "total/ICMSTot/vICMSDeson",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do ICMS desonerado"
+    },
+    {
+      "nome": "vFCPUFDest",
+      "caminho": "total/ICMSTot/vFCPUFDest",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total do ICMS relativo ao Fundo de Combate à Pobreza (FCP) para a UF de destino."
+    },
+    {
+      "nome": "vICMSUFDest",
+      "caminho": "total/ICMSTot/vICMSUFDest",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total do ICMS de partilha para a UF do destinatário"
+    },
+    {
+      "nome": "vICMSUFRemet",
+      "caminho": "total/ICMSTot/vICMSUFRemet",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total do ICMS de partilha para a UF do remetente"
+    },
+    {
+      "nome": "vFCP",
+      "caminho": "total/ICMSTot/vFCP",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do FCP (Fundo de Combate à Pobreza)."
+    },
+    {
+      "nome": "vBCST",
+      "caminho": "total/ICMSTot/vBCST",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "BC do ICMS ST"
+    },
+    {
+      "nome": "vST",
+      "caminho": "total/ICMSTot/vST",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do ICMS ST"
+    },
+    {
+      "nome": "vFCPST",
+      "caminho": "total/ICMSTot/vFCPST",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do FCP (Fundo de Combate à Pobreza) retido por substituição tributária."
+    },
+    {
+      "nome": "vFCPSTRet",
+      "caminho": "total/ICMSTot/vFCPSTRet",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do FCP (Fundo de Combate à Pobreza) retido anteriormente por substituição tributária."
+    },
+    {
+      "nome": "qBCMono",
+      "caminho": "total/ICMSTot/qBCMono",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total da quantidade tributada do ICMS monofásico próprio"
+    },
+    {
+      "nome": "vICMSMono",
+      "caminho": "total/ICMSTot/vICMSMono",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total do ICMS monofásico próprio"
+    },
+    {
+      "nome": "qBCMonoReten",
+      "caminho": "total/ICMSTot/qBCMonoReten",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total da quantidade tributada do ICMS monofásico sujeito a retenção"
+    },
+    {
+      "nome": "vICMSMonoReten",
+      "caminho": "total/ICMSTot/vICMSMonoReten",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total do ICMS monofásico sujeito a retenção"
+    },
+    {
+      "nome": "qBCMonoRet",
+      "caminho": "total/ICMSTot/qBCMonoRet",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor total da quantidade tributada do ICMS monofásico retido anteriormente"
+    },
+    {
+      "nome": "vICMSMonoRet",
+      "caminho": "total/ICMSTot/vICMSMonoRet",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do ICMS monofásico retido anteriormente"
+    },
+    {
+      "nome": "vProd",
+      "caminho": "total/ICMSTot/vProd",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total dos produtos e serviços"
+    },
+    {
+      "nome": "vFrete",
+      "caminho": "total/ICMSTot/vFrete",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do Frete"
+    },
+    {
+      "nome": "vSeg",
+      "caminho": "total/ICMSTot/vSeg",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do Seguro"
+    },
+    {
+      "nome": "vDesc",
+      "caminho": "total/ICMSTot/vDesc",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do Desconto"
+    },
+    {
+      "nome": "vII",
+      "caminho": "total/ICMSTot/vII",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do II"
+    },
+    {
+      "nome": "vIPI",
+      "caminho": "total/ICMSTot/vIPI",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do IPI"
+    },
+    {
+      "nome": "vIPIDevol",
+      "caminho": "total/ICMSTot/vIPIDevol",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total do IPI devolvido. Deve ser informado quando preenchido o Grupo Tributos Devolvidos na emissão de nota finNFe=4 (devolução) nas operações com não contribuintes do IPI. Corresponde ao total da soma dos campos id: UA04."
+    },
+    {
+      "nome": "vPIS",
+      "caminho": "total/ICMSTot/vPIS",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do PIS"
+    },
+    {
+      "nome": "vCOFINS",
+      "caminho": "total/ICMSTot/vCOFINS",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do COFINS"
+    },
+    {
+      "nome": "vOutro",
+      "caminho": "total/ICMSTot/vOutro",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Outras Despesas acessórias"
+    },
+    {
+      "nome": "vNF",
+      "caminho": "total/ICMSTot/vNF",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total da NF-e"
+    },
+    {
+      "nome": "vTotTrib",
+      "caminho": "total/ICMSTot/vTotTrib",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor estimado total de impostos federais, estaduais e municipais"
+    },
+    {
+      "nome": "ISSQNtot",
+      "caminho": "total/ISSQNtot",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Totais referentes ao ISSQN"
+    },
+    {
+      "nome": "vServ",
+      "caminho": "total/ISSQNtot/vServ",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total dos Serviços sob não-incidência ou não tributados pelo ICMS"
+    },
+    {
+      "nome": "vBC",
+      "caminho": "total/ISSQNtot/vBC",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Base de Cálculo do ISS"
+    },
+    {
+      "nome": "vISS",
+      "caminho": "total/ISSQNtot/vISS",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total do ISS"
+    },
+    {
+      "nome": "vPIS",
+      "caminho": "total/ISSQNtot/vPIS",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do PIS sobre serviços"
+    },
+    {
+      "nome": "vCOFINS",
+      "caminho": "total/ISSQNtot/vCOFINS",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do COFINS sobre serviços"
+    },
+    {
+      "nome": "dCompet",
+      "caminho": "total/ISSQNtot/dCompet",
+      "tipo": "TData",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Data da prestação do serviço  (AAAA-MM-DD)"
+    },
+    {
+      "nome": "vDeducao",
+      "caminho": "total/ISSQNtot/vDeducao",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor dedução para redução da base de cálculo"
+    },
+    {
+      "nome": "vOutro",
+      "caminho": "total/ISSQNtot/vOutro",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor outras retenções"
+    },
+    {
+      "nome": "vDescIncond",
+      "caminho": "total/ISSQNtot/vDescIncond",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor desconto incondicionado"
+    },
+    {
+      "nome": "vDescCond",
+      "caminho": "total/ISSQNtot/vDescCond",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor desconto condicionado"
+    },
+    {
+      "nome": "vISSRet",
+      "caminho": "total/ISSQNtot/vISSRet",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total Retenção ISS"
+    },
+    {
+      "nome": "cRegTrib",
+      "caminho": "total/ISSQNtot/cRegTrib",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Código do regime especial de tributação"
+    },
+    {
+      "nome": "retTrib",
+      "caminho": "total/retTrib",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Retenção de Tributos Federais"
+    },
+    {
+      "nome": "vRetPIS",
+      "caminho": "total/retTrib/vRetPIS",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Retido de PIS"
+    },
+    {
+      "nome": "vRetCOFINS",
+      "caminho": "total/retTrib/vRetCOFINS",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Retido de COFINS"
+    },
+    {
+      "nome": "vRetCSLL",
+      "caminho": "total/retTrib/vRetCSLL",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Retido de CSLL"
+    },
+    {
+      "nome": "vBCIRRF",
+      "caminho": "total/retTrib/vBCIRRF",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Base de Cálculo do IRRF"
+    },
+    {
+      "nome": "vIRRF",
+      "caminho": "total/retTrib/vIRRF",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Retido de IRRF"
+    },
+    {
+      "nome": "vBCRetPrev",
+      "caminho": "total/retTrib/vBCRetPrev",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Base de Cálculo da Retenção da Previdêncica Social"
+    },
+    {
+      "nome": "vRetPrev",
+      "caminho": "total/retTrib/vRetPrev",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor da Retenção da Previdêncica Social"
+    },
+    {
+      "nome": "ISTot",
+      "caminho": "total/ISTot",
+      "tipo": "TISTot",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valores totais da NF com Imposto Seletivo"
+    },
+    {
+      "nome": "IBSCBSTot",
+      "caminho": "total/IBSCBSTot",
+      "tipo": "TIBSCBSMonoTot",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valores totais da NF com IBS / CBS"
+    },
+    {
+      "nome": "vNFTot",
+      "caminho": "total/vNFTot",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor Total da NF considerando os impostos por fora IBS, CBS e IS"
+    }
+  ],
+  "transp": [
+    {
+      "nome": "modFrete",
+      "caminho": "transp/modFrete",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Modalidade do frete\n0- Contratação do Frete por conta do Remetente (CIF);\n1- Contratação do Frete por conta do destinatário/remetente (FOB);\n2- Contratação do Frete por conta de terceiros;\n3- Transporte próprio por conta do remetente;\n4- Transporte próprio por conta do destinatário;\n9- Sem Ocorrência de transporte."
+    },
+    {
+      "nome": "transporta",
+      "caminho": "transp/transporta",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do transportador"
+    },
+    {
+      "nome": "xNome",
+      "caminho": "transp/transporta/xNome",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Razão Social ou nome do transportador"
+    },
+    {
+      "nome": "IE",
+      "caminho": "transp/transporta/IE",
+      "tipo": "TIeDest",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Inscrição Estadual (v2.0)"
+    },
+    {
+      "nome": "xEnder",
+      "caminho": "transp/transporta/xEnder",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Endereço completo"
+    },
+    {
+      "nome": "xMun",
+      "caminho": "transp/transporta/xMun",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Nome do munícipio"
+    },
+    {
+      "nome": "UF",
+      "caminho": "transp/transporta/UF",
+      "tipo": "TUf",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Sigla da UF"
+    },
+    {
+      "nome": "CNPJ",
+      "caminho": "transp/transporta/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CNPJ do transportador"
+    },
+    {
+      "nome": "CPF",
+      "caminho": "transp/transporta/CPF",
+      "tipo": "TCpf",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CPF do transportador"
+    },
+    {
+      "nome": "retTransp",
+      "caminho": "transp/retTransp",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados da retenção  ICMS do Transporte"
+    },
+    {
+      "nome": "vServ",
+      "caminho": "transp/retTransp/vServ",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Serviço"
+    },
+    {
+      "nome": "vBCRet",
+      "caminho": "transp/retTransp/vBCRet",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "BC da Retenção do ICMS"
+    },
+    {
+      "nome": "pICMSRet",
+      "caminho": "transp/retTransp/pICMSRet",
+      "tipo": "TDec_0302a04",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Alíquota da Retenção"
+    },
+    {
+      "nome": "vICMSRet",
+      "caminho": "transp/retTransp/vICMSRet",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do ICMS Retido"
+    },
+    {
+      "nome": "CFOP",
+      "caminho": "transp/retTransp/CFOP",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código Fiscal de Operações e Prestações"
+    },
+    {
+      "nome": "cMunFG",
+      "caminho": "transp/retTransp/cMunFG",
+      "tipo": "TCodMunIBGE",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Código do Município de Ocorrência do Fato Gerador (utilizar a tabela do IBGE)"
+    },
+    {
+      "nome": "vol",
+      "caminho": "transp/vol",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Dados dos volumes"
+    },
+    {
+      "nome": "qVol",
+      "caminho": "transp/vol/qVol",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Quantidade de volumes transportados"
+    },
+    {
+      "nome": "esp",
+      "caminho": "transp/vol/esp",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Espécie dos volumes transportados"
+    },
+    {
+      "nome": "marca",
+      "caminho": "transp/vol/marca",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Marca dos volumes transportados"
+    },
+    {
+      "nome": "nVol",
+      "caminho": "transp/vol/nVol",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Numeração dos volumes transportados"
+    },
+    {
+      "nome": "pesoL",
+      "caminho": "transp/vol/pesoL",
+      "tipo": "TDec_1203",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Peso líquido (em kg)"
+    },
+    {
+      "nome": "pesoB",
+      "caminho": "transp/vol/pesoB",
+      "tipo": "TDec_1203",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Peso bruto (em kg)"
+    },
+    {
+      "nome": "lacres",
+      "caminho": "transp/vol/lacres",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": ""
+    },
+    {
+      "nome": "nLacre",
+      "caminho": "transp/vol/lacres/nLacre",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Número dos Lacres"
+    },
+    {
+      "nome": "vagao",
+      "caminho": "transp/vagao",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Identificação do vagão (v2.0)"
+    },
+    {
+      "nome": "balsa",
+      "caminho": "transp/balsa",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Identificação da balsa (v2.0)"
+    },
+    {
+      "nome": "veicTransp",
+      "caminho": "transp/veicTransp",
+      "tipo": "TVeiculo",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados do veículo"
+    },
+    {
+      "nome": "reboque",
+      "caminho": "transp/reboque",
+      "tipo": "TVeiculo",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Dados do reboque/Dolly (v2.0)"
+    }
+  ],
+  "cobr": [
+    {
+      "nome": "fat",
+      "caminho": "cobr/fat",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Dados da fatura"
+    },
+    {
+      "nome": "nFat",
+      "caminho": "cobr/fat/nFat",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número da fatura"
+    },
+    {
+      "nome": "vOrig",
+      "caminho": "cobr/fat/vOrig",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor original da fatura"
+    },
+    {
+      "nome": "vDesc",
+      "caminho": "cobr/fat/vDesc",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do desconto da fatura"
+    },
+    {
+      "nome": "vLiq",
+      "caminho": "cobr/fat/vLiq",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor líquido da fatura"
+    },
+    {
+      "nome": "dup",
+      "caminho": "cobr/dup",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Dados das duplicatas NT 2011/004"
+    },
+    {
+      "nome": "nDup",
+      "caminho": "cobr/dup/nDup",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número da duplicata"
+    },
+    {
+      "nome": "dVenc",
+      "caminho": "cobr/dup/dVenc",
+      "tipo": "TData",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Data de vencimento da duplicata (AAAA-MM-DD)"
+    },
+    {
+      "nome": "vDup",
+      "caminho": "cobr/dup/vDup",
+      "tipo": "TDec_1302Opc",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor da duplicata"
+    }
+  ],
+  "pag": [
+    {
+      "nome": "detPag",
+      "caminho": "pag/detPag",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": true,
+      "documentacao": "Grupo de detalhamento da forma de pagamento."
+    },
+    {
+      "nome": "indPag",
+      "caminho": "pag/detPag/indPag",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Indicador da Forma de Pagamento:0-Pagamento à Vista;1-Pagamento à Prazo;"
+    },
+    {
+      "nome": "tPag",
+      "caminho": "pag/detPag/tPag",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Forma de Pagamento:"
+    },
+    {
+      "nome": "xPag",
+      "caminho": "pag/detPag/xPag",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Descrição do Meio de Pagamento"
+    },
+    {
+      "nome": "vPag",
+      "caminho": "pag/detPag/vPag",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor do Pagamento. Esta tag poderá ser omitida quando a tag tPag=90 (Sem Pagamento), caso contrário deverá ser preenchida."
+    },
+    {
+      "nome": "dPag",
+      "caminho": "pag/detPag/dPag",
+      "tipo": "TData",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Data do Pagamento"
+    },
+    {
+      "nome": "card",
+      "caminho": "pag/detPag/card",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Grupo de Cartões, PIX, Boletos e outros Pagamentos Eletrônicos"
+    },
+    {
+      "nome": "tpIntegra",
+      "caminho": "pag/detPag/card/tpIntegra",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Tipo de Integração do processo de pagamento com o sistema de automação da empresa:\n1 - Pagamento integrado com o sistema de automação da empresa (Ex.: equipamento TEF, Comércio Eletrônico, POS Integrado);\n2 - Pagamento não integrado com o sistema de automação da empresa (Ex.: equipamento POS Simples)."
+    },
+    {
+      "nome": "CNPJ",
+      "caminho": "pag/detPag/card/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "CNPJ da instituição de pagamento"
+    },
+    {
+      "nome": "tBand",
+      "caminho": "pag/detPag/card/tBand",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Bandeira da operadora de cartão"
+    },
+    {
+      "nome": "cAut",
+      "caminho": "pag/detPag/card/cAut",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Número de autorização da operação com cartões, PIX, boletos e outros pagamentos eletrônicos"
+    },
+    {
+      "nome": "CNPJReceb",
+      "caminho": "pag/detPag/card/CNPJReceb",
+      "tipo": "TCnpj",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "CNPJ do beneficiário do pagamento"
+    },
+    {
+      "nome": "idTermPag",
+      "caminho": "pag/detPag/card/idTermPag",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Identificador do terminal de pagamento"
+    },
+    {
+      "nome": "CNPJPag",
+      "caminho": "pag/detPag/CNPJPag",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CNPJ transacional do pagamento - Preencher informando o CNPJ do estabelecimento onde o pagamento foi processado/transacionado/recebido quando a emissão do documento fiscal ocorrer em estabelecimento distinto"
+    },
+    {
+      "nome": "UFPag",
+      "caminho": "pag/detPag/UFPag",
+      "tipo": "TUfEmi",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "UF do CNPJ do estabelecimento onde o pagamento foi processado/transacionado/recebido."
+    },
+    {
+      "nome": "vTroco",
+      "caminho": "pag/vTroco",
+      "tipo": "TDec_1302",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Valor do Troco."
+    }
+  ],
+  "infIntermed": [
+    {
+      "nome": "CNPJ",
+      "caminho": "infIntermed/CNPJ",
+      "tipo": "TCnpj",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "CNPJ do Intermediador da Transação (agenciador, plataforma de delivery, marketplace e similar) de serviços e de negócios."
+    },
+    {
+      "nome": "idCadIntTran",
+      "caminho": "infIntermed/idCadIntTran",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Identificador cadastrado no intermediador"
+    }
+  ],
+  "infAdic": [
+    {
+      "nome": "infAdFisco",
+      "caminho": "infAdic/infAdFisco",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informações adicionais de interesse do Fisco (v2.0)"
+    },
+    {
+      "nome": "infCpl",
+      "caminho": "infAdic/infCpl",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informações complementares de interesse do Contribuinte"
+    },
+    {
+      "nome": "obsCont",
+      "caminho": "infAdic/obsCont",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Campo de uso livre do contribuinte\ninformar o nome do campo no atributo xCampo\ne o conteúdo do campo no xTexto"
+    },
+    {
+      "nome": "xTexto",
+      "caminho": "infAdic/obsCont/xTexto",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "obsFisco",
+      "caminho": "infAdic/obsFisco",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Campo de uso exclusivo do Fisco\ninformar o nome do campo no atributo xCampo\ne o conteúdo do campo no xTexto"
+    },
+    {
+      "nome": "xTexto",
+      "caminho": "infAdic/obsFisco/xTexto",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": ""
+    },
+    {
+      "nome": "procRef",
+      "caminho": "infAdic/procRef",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Grupo de informações do  processo referenciado"
+    },
+    {
+      "nome": "nProc",
+      "caminho": "infAdic/procRef/nProc",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Indentificador do processo ou ato\nconcessório"
+    },
+    {
+      "nome": "indProc",
+      "caminho": "infAdic/procRef/indProc",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Origem do processo, informar com:\n0 - SEFAZ;\n1 - Justiça Federal;\n2 - Justiça Estadual;\n3 - Secex/RFB;\n4 - CONFAZ;\n9 - Outros."
+    },
+    {
+      "nome": "tpAto",
+      "caminho": "infAdic/procRef/tpAto",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Tipo do ato concessório\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tPara origem do Processo na SEFAZ (indProc=0), informar o\ntipo de ato concessório:\n08 - Termo de Acordo;\n10 - Regime Especial;\n12 - Autorização específica;\n14 - Ajuste SINIEF;\n15 - Convênio ICMS."
+    }
+  ],
+  "exporta": [
+    {
+      "nome": "UFSaidaPais",
+      "caminho": "exporta/UFSaidaPais",
+      "tipo": "TUfEmi",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Sigla da UF de Embarque ou de transposição de fronteira"
+    },
+    {
+      "nome": "xLocExporta",
+      "caminho": "exporta/xLocExporta",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Local de Embarque ou de transposição de fronteira"
+    },
+    {
+      "nome": "xLocDespacho",
+      "caminho": "exporta/xLocDespacho",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Descrição do local de despacho"
+    }
+  ],
+  "compra": [
+    {
+      "nome": "xNEmp",
+      "caminho": "compra/xNEmp",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informação da Nota de Empenho de compras públicas (NT2011/004)"
+    },
+    {
+      "nome": "xPed",
+      "caminho": "compra/xPed",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informação do pedido"
+    },
+    {
+      "nome": "xCont",
+      "caminho": "compra/xCont",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": false,
+      "documentacao": "Informação do contrato"
+    }
+  ],
+  "cana": [
+    {
+      "nome": "safra",
+      "caminho": "cana/safra",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Identificação da safra"
+    },
+    {
+      "nome": "ref",
+      "caminho": "cana/ref",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Mês e Ano de Referência, formato: MM/AAAA"
+    },
+    {
+      "nome": "forDia",
+      "caminho": "cana/forDia",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": true,
+      "documentacao": "Fornecimentos diários"
+    },
+    {
+      "nome": "qtde",
+      "caminho": "cana/forDia/qtde",
+      "tipo": "TDec_1110v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Quantidade em quilogramas - peso líquido"
+    },
+    {
+      "nome": "qTotMes",
+      "caminho": "cana/qTotMes",
+      "tipo": "TDec_1110v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Total do mês"
+    },
+    {
+      "nome": "qTotAnt",
+      "caminho": "cana/qTotAnt",
+      "tipo": "TDec_1110v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Total Anterior"
+    },
+    {
+      "nome": "qTotGer",
+      "caminho": "cana/qTotGer",
+      "tipo": "TDec_1110v",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Total Geral"
+    },
+    {
+      "nome": "deduc",
+      "caminho": "cana/deduc",
+      "tipo": "",
+      "obrigatorio": false,
+      "multiplo": true,
+      "documentacao": "Deduções - Taxas e Contribuições"
+    },
+    {
+      "nome": "xDed",
+      "caminho": "cana/deduc/xDed",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Descrição da Dedução"
+    },
+    {
+      "nome": "vDed",
+      "caminho": "cana/deduc/vDed",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "valor da dedução"
+    },
+    {
+      "nome": "vFor",
+      "caminho": "cana/vFor",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor  dos fornecimentos"
+    },
+    {
+      "nome": "vTotDed",
+      "caminho": "cana/vTotDed",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Total das Deduções"
+    },
+    {
+      "nome": "vLiqFor",
+      "caminho": "cana/vLiqFor",
+      "tipo": "TDec_1302",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Valor Líquido dos fornecimentos"
+    }
+  ],
+  "infSolicNFF": [
+    {
+      "nome": "xSolic",
+      "caminho": "infSolicNFF/xSolic",
+      "tipo": "",
+      "obrigatorio": true,
+      "multiplo": false,
+      "documentacao": "Solicitação do pedido de emissão da NFF"
+    }
+  ]
+}

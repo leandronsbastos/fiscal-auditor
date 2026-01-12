@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 """
 Aplicação Web do Fiscal Auditor.
-Interface web para upload de XMLs e visualização de relatórios tributários.
+Interface web para consulta de documentos fiscais do datalake e visualização de relatórios tributários.
 """
-from fastapi import FastAPI, UploadFile, File, Form, Request, Depends, HTTPException
+from fastapi import FastAPI, Form, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
-from typing import List
 from pydantic import BaseModel
 import os
-import tempfile
-import shutil
 from datetime import datetime
 import json
 from decimal import Decimal
@@ -151,9 +148,9 @@ async def usuario_logado(
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, empresa_id: int = None):
-    """Página inicial - painel ou upload dependendo do empresa_id."""
+    """Página inicial - painel ou consulta dependendo do empresa_id."""
     if empresa_id:
-        # Se tem empresa_id, mostrar página de upload
+        # Se tem empresa_id, mostrar página de consulta
         return templates.TemplateResponse("index.html", {
             "request": request,
             "empresa_id": empresa_id
@@ -317,162 +314,6 @@ async def processar_datalake(
         return JSONResponse({
             "success": False,
             "message": f"Erro ao processar datalake: {str(e)}"
-        }, status_code=500)
-
-
-@app.post("/upload")
-async def upload_xmls(
-    request: Request,
-    empresa_id: int = Form(...),
-    tipo_data: str = Form(...),
-    data_inicio: str = Form(...),
-    data_fim: str = Form(...),
-    arquivos: List[UploadFile] = File(...),
-    usuario_atual: schemas.UsuarioResponse = Depends(obter_usuario_atual),
-    db: Session = Depends(get_db)
-):
-    """Processa os arquivos XML enviados (upload manual)."""
-    try:
-        # Verificar acesso à empresa
-        if not verificar_acesso_empresa(usuario_atual, empresa_id, db):
-            raise HTTPException(status_code=403, detail="Você não tem acesso a esta empresa")
-        
-        # Buscar empresa
-        empresa = crud.obter_empresa(db, empresa_id)
-        if not empresa:
-            raise HTTPException(status_code=404, detail="Empresa não encontrada")
-        
-        # Converter datas
-        from datetime import datetime
-        data_inicio_dt = datetime.strptime(data_inicio, "%Y-%m-%d")
-        data_fim_dt = datetime.strptime(data_fim, "%Y-%m-%d")
-        
-        # Limpar dados anteriores
-        dados_sessao["documentos"] = []
-        dados_sessao["validacoes"] = []
-        dados_sessao["mapa"] = None
-        dados_sessao["relatorios"] = {}
-        dados_sessao["empresa_id"] = empresa_id
-        dados_sessao["filtro_data_tipo"] = tipo_data
-        dados_sessao["filtro_data_inicio"] = data_inicio
-        dados_sessao["filtro_data_fim"] = data_fim
-        dados_sessao["fonte_dados"] = "upload"
-        
-        # Inicializar componentes
-        cnpj_limpo = empresa.cnpj.replace(".", "").replace("/", "").replace("-", "")
-        reader = XMLReader(cnpj_limpo)
-        validador = ValidadorTributario()
-        apurador = ApuradorTributario()
-        gerador = GeradorRelatorios()
-        
-        documentos = []
-        validacoes = []
-        erros = []
-        documentos_filtrados = 0
-        
-        # Processar cada arquivo
-        for arquivo in arquivos:
-            if not arquivo.filename.endswith('.xml'):
-                erros.append(f"{arquivo.filename}: Não é um arquivo XML")
-                continue
-            
-            try:
-                # Salvar temporariamente
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.xml') as tmp:
-                    conteudo = await arquivo.read()
-                    tmp.write(conteudo)
-                    tmp_path = tmp.name
-                
-                # Processar XML
-                doc = reader.ler_xml(tmp_path)
-                
-                # Aplicar filtro de data
-                data_documento = None
-                if tipo_data == "emissao":
-                    data_documento = doc.data_emissao
-                elif tipo_data == "autorizacao" and hasattr(doc, 'data_autorizacao'):
-                    data_documento = doc.data_autorizacao or doc.data_emissao
-                else:
-                    data_documento = doc.data_emissao
-                
-                # Verificar se está no período
-                if data_documento:
-                    if data_inicio_dt.date() <= data_documento.date() <= data_fim_dt.date():
-                        documentos.append(doc)
-                        
-                        # Validar
-                        validacao = validador.validar_documento(doc)
-                        validacoes.append(validacao)
-                        
-                        # Adicionar para apuração
-                        apurador.adicionar_documento(doc)
-                    else:
-                        documentos_filtrados += 1
-                
-                # Remover arquivo temporário
-                os.unlink(tmp_path)
-                
-            except Exception as e:
-                erros.append(f"{arquivo.filename}: {str(e)}")
-        
-        if not documentos:
-            mensagem = "Nenhum documento válido foi encontrado"
-            if documentos_filtrados > 0:
-                mensagem += f". {documentos_filtrados} documento(s) fora do período selecionado"
-            return JSONResponse({
-                "success": False,
-                "message": "Nenhum documento foi processado com sucesso",
-                "erros": erros
-            }, status_code=400)
-        
-        # Calcular período automaticamente baseado nos documentos
-        datas = [doc.data_emissao for doc in documentos if doc.data_emissao]
-        if datas:
-            data_mais_antiga = min(datas)
-            periodo = f"{data_mais_antiga.month:02d}/{data_mais_antiga.year}"
-        else:
-            periodo = f"{data_inicio_dt.month:02d}/{data_inicio_dt.year}"
-        
-        # Realizar apuração
-        mapa = apurador.apurar(periodo)
-        
-        # Gerar relatórios
-        relatorios = {
-            "entradas": gerador.gerar_demonstrativo_entradas(documentos),
-            "saidas": gerador.gerar_demonstrativo_saidas(documentos),
-            "mapa": gerador.gerar_mapa_apuracao(mapa),
-            "validacao": gerador.gerar_relatorio_validacao(validacoes),
-            "completo": gerador.gerar_relatorio_completo(documentos, mapa, validacoes)
-        }
-        
-        # Armazenar na sessão
-        dados_sessao["documentos"] = documentos
-        dados_sessao["validacoes"] = validacoes
-        dados_sessao["mapa"] = mapa
-        dados_sessao["relatorios"] = relatorios
-        dados_sessao["empresa"] = {
-            "id": empresa.id,
-            "cnpj": empresa.cnpj,
-            "razao_social": empresa.razao_social
-        }
-        
-        mensagem = f"{len(documentos)} documento(s) processado(s) com sucesso"
-        if documentos_filtrados > 0:
-            mensagem += f" ({documentos_filtrados} documento(s) filtrado(s) por data)"
-        
-        return JSONResponse({
-            "success": True,
-            "message": mensagem,
-            "total_documentos": len(documentos),
-            "documentos_filtrados": documentos_filtrados,
-            "periodo": periodo,
-            "erros": erros if erros else None
-        })
-        
-    except Exception as e:
-        return JSONResponse({
-            "success": False,
-            "message": f"Erro ao processar: {str(e)}"
         }, status_code=500)
 
 

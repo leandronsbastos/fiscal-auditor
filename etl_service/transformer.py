@@ -127,6 +127,10 @@ class DataTransformer:
             valor_pis=self._to_decimal(totais.get('valor_pis')),
             valor_cofins=self._to_decimal(totais.get('valor_cofins')),
             
+            # IBS/CBS (Reforma Tributária)
+            valor_ibs=self._to_decimal(totais.get('valor_ibs')),
+            valor_cbs=self._to_decimal(totais.get('valor_cbs')),
+            
             # Outros
             valor_aproximado_tributos=self._to_decimal(totais.get('valor_aproximado_tributos')),
             informacoes_adicionais_fisco=info_adic.get('informacoes_fisco'),
@@ -163,6 +167,37 @@ class DataTransformer:
             valor_original_fatura=self._to_decimal(cobranca.get('fatura', {}).get('valor_original')),
             valor_desconto_fatura=self._to_decimal(cobranca.get('fatura', {}).get('valor_desconto')),
             valor_liquido_fatura=self._to_decimal(cobranca.get('fatura', {}).get('valor_liquido')),
+            
+            # Campos Adicionais de Identificação
+            natureza_operacao=identificacao.get('natureza_operacao'),
+            codigo_municipio_fg_ibs=identificacao.get('codigo_municipio_fg_ibs'),
+            indicador_final=identificacao.get('consumidor_final'),
+            indicador_presenca=identificacao.get('presenca_comprador'),
+            indicador_intermediador=identificacao.get('indicador_intermediador'),
+            processo_emissao=identificacao.get('processo_emissao'),
+            versao_processo=identificacao.get('versao_processo'),
+            
+            # ICMS Monofásico - Totalizadores (NT 2023.003)
+            quantidade_bc_mono=self._to_decimal(totais.get('quantidade_bc_mono')),
+            valor_icms_mono=self._to_decimal(totais.get('valor_icms_mono')),
+            quantidade_bc_mono_reten=self._to_decimal(totais.get('quantidade_bc_mono_reten')),
+            valor_icms_mono_reten=self._to_decimal(totais.get('valor_icms_mono_reten')),
+            quantidade_bc_mono_ret=self._to_decimal(totais.get('quantidade_bc_mono_ret')),
+            valor_icms_mono_ret=self._to_decimal(totais.get('valor_icms_mono_ret')),
+            
+            # Pagamento Eletrônico (NT 2023.001)
+            tipo_integracao_pagamento=pagamento.get('detalhes', [{}])[0].get('tipo_integracao') if pagamento.get('detalhes') else None,
+            cnpj_instituicao_pagamento=pagamento.get('detalhes', [{}])[0].get('cnpj_credenciadora') if pagamento.get('detalhes') else None,
+            bandeira_operadora=pagamento.get('detalhes', [{}])[0].get('bandeira') if pagamento.get('detalhes') else None,
+            numero_autorizacao_pagamento=pagamento.get('detalhes', [{}])[0].get('autorizacao') if pagamento.get('detalhes') else None,
+            cnpj_beneficiario_pagamento=pagamento.get('detalhes', [{}])[0].get('cnpj_recebedor') if pagamento.get('detalhes') else None,
+            terminal_pagamento=pagamento.get('detalhes', [{}])[0].get('id_terminal') if pagamento.get('detalhes') else None,
+            cnpj_transacional_pagamento=pagamento.get('detalhes', [{}])[0].get('cnpj_pagador') if pagamento.get('detalhes') else None,
+            uf_pagamento=pagamento.get('detalhes', [{}])[0].get('uf_pagador') if pagamento.get('detalhes') else None,
+            
+            # Intermediador (NT 2020.006)
+            cnpj_intermediador=dados_extraidos.get('intermediador', {}).get('cnpj'),
+            identificador_intermediador=dados_extraidos.get('intermediador', {}).get('id_cadastro'),
             
             # XML completo
             xml_completo=dados_extraidos.get('xml_completo'),
@@ -277,6 +312,15 @@ class DataTransformer:
             quantidade_vendida_cofins=self._to_decimal(cofins.get('quantidade_vendida')),
             aliquota_cofins_reais=self._to_decimal(cofins.get('aliquota_reais')),
             
+            # IBS/CBS (Reforma Tributária)
+            situacao_tributaria_ibscbs=impostos.get('ibscbs', {}).get('situacao_tributaria'),
+            base_calculo_ibs=self._to_decimal(impostos.get('ibscbs', {}).get('ibs', {}).get('base_calculo')),
+            aliquota_ibs=self._to_decimal(impostos.get('ibscbs', {}).get('ibs', {}).get('aliquota')),
+            valor_ibs=self._to_decimal(impostos.get('ibscbs', {}).get('ibs', {}).get('valor')),
+            base_calculo_cbs=self._to_decimal(impostos.get('ibscbs', {}).get('cbs', {}).get('base_calculo')),
+            aliquota_cbs=self._to_decimal(impostos.get('ibscbs', {}).get('cbs', {}).get('aliquota')),
+            valor_cbs=self._to_decimal(impostos.get('ibscbs', {}).get('cbs', {}).get('valor')),
+            
             # Importação
             numero_di=di.get('numero'),
             data_di=self._to_date(di.get('data')),
@@ -287,9 +331,38 @@ class DataTransformer:
             valor_afrmm=self._to_decimal(di.get('valor_afrmm')),
             forma_intermediacao=di.get('forma_intermediacao'),
             
+            # Benefício Fiscal (NT 2021.004)
+            codigo_beneficio_fiscal=produto.get('codigo_beneficio_fiscal'),
+            codigo_beneficio_fiscal_ibs=produto.get('codigo_beneficio_fiscal_ibs'),
+            
+            # Indicadores e Complementos
+            indicador_escala_relevante=produto.get('indicador_escala_relevante'),
+            cnpj_fabricante=produto.get('cnpj_fabricante'),
+            
+            # ICMS Monofásico (NT 2023.003)
+            quantidade_bc_mono=self._to_decimal(icms.get('quantidade_bc_mono')),
+            aliquota_adrem_mono=self._to_decimal(icms.get('aliquota_adrem_mono')),
+            valor_icms_mono=self._to_decimal(icms.get('valor_icms_mono')),
+            quantidade_bc_mono_reten=self._to_decimal(icms.get('quantidade_bc_mono_reten')),
+            aliquota_adrem_mono_reten=self._to_decimal(icms.get('aliquota_adrem_mono_reten')),
+            valor_icms_mono_reten=self._to_decimal(icms.get('valor_icms_mono_reten')),
+            quantidade_bc_mono_ret=self._to_decimal(icms.get('quantidade_bc_mono_ret')),
+            aliquota_adrem_mono_ret=self._to_decimal(icms.get('aliquota_adrem_mono_ret')),
+            valor_icms_mono_ret=self._to_decimal(icms.get('valor_icms_mono_ret')),
+            
             # Informações adicionais
             informacoes_adicionais=item_data.get('informacoes_adicionais'),
         )
+        
+        # Crédito Presumido (NT 2023.002) - Armazenar como JSON por enquanto
+        creditos_presumidos = produto.get('creditos_presumidos', [])
+        if creditos_presumidos:
+            # Pegar o primeiro crédito presumido (pode ser expandido para múltiplos no futuro)
+            primeiro_credito = creditos_presumidos[0]
+            item.codigo_credito_presumido = primeiro_credito.get('codigo')
+            item.percentual_credito_presumido = self._to_decimal(primeiro_credito.get('percentual'))
+            item.valor_credito_presumido = self._to_decimal(primeiro_credito.get('valor'))
+            item.tipo_credito_presumido_ibs_zfm = primeiro_credito.get('tipo_ibs_zfm')
         
         return item
 
