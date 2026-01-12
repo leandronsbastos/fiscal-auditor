@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Portal Administrativo ETL{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-database"></i>
+            <h2>ETL Admin</h2>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <a href="/" class="nav-item {% if request.path == '/' %}active{% endif %}">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/folders" class="nav-item {% if request.path == '/folders' %}active{% endif %}">
+                <i class="fas fa-folder-open"></i>
+                <span>Configurar Pastas</span>
+            </a>
+            <a href="/scheduler" class="nav-item {% if request.path == '/scheduler' %}active{% endif %}">
+                <i class="fas fa-clock"></i>
+                <span>Agendamentos</span>
+            </a>
+            <a href="/empresas" class="nav-item {% if request.path == '/empresas' %}active{% endif %}">
+                <i class="fas fa-building"></i>
+                <span>Empresas & Usuários</span>
+            </a>
+            <a href="/processes" class="nav-item {% if request.path == '/processes' %}active{% endif %}">
+                <i class="fas fa-cogs"></i>
+                <span>Processos ETL</span>
+            </a>
+            <a href="/logs" class="nav-item {% if request.path == '/logs' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i>
+                <span>Logs & Monitoramento</span>
+            </a>
+            <a href="/settings" class="nav-item {% if request.path == '/settings' %}active{% endif %}">
+                <i class="fas fa-sliders-h"></i>
+                <span>Configurações</span>
+            </a>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="system-status" id="systemStatus">
+                <i class="fas fa-circle status-icon"></i>
+                <span>Carregando...</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <h1>{% block page_title %}Portal Administrativo{% endblock %}</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-cpu"></i>
+                        <span id="cpuPercent">--%</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-memory"></i>
+                        <span id="memoryPercent">--%</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-hdd"></i>
+                        <span id="diskPercent">--%</span>
+                    </div>
+                </div>
+                <div class="user-menu">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <script>
+        // Atualizar status do sistema
+        async function updateSystemStatus() {
+            try {
+                const response = await fetch('/api/system/health');
+                const data = await response.json();
+                
+                const statusEl = document.getElementById('systemStatus');
+                if (data.status === 'healthy') {
+                    statusEl.innerHTML = '<i class="fas fa-circle status-icon status-success"></i><span>Sistema Online</span>';
+                } else {
+                    statusEl.innerHTML = '<i class="fas fa-circle status-icon status-error"></i><span>Sistema com Problemas</span>';
+                }
+                
+                // Atualizar métricas do header
+                document.getElementById('cpuPercent').textContent = data.system.cpu_percent.toFixed(1) + '%';
+                document.getElementById('memoryPercent').textContent = data.system.memory_percent.toFixed(1) + '%';
+                document.getElementById('diskPercent').textContent = data.system.disk_percent.toFixed(1) + '%';
+            } catch (error) {
+                console.error('Erro ao atualizar status:', error);
+            }
+        }
+        
+        // Atualizar a cada 5 segundos
+        updateSystemStatus();
+        setInterval(updateSystemStatus, 5000);
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

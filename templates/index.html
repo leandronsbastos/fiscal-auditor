@@ -47,6 +47,45 @@
         .btn-back:hover {
             background: rgba(255,255,255,0.3);
         }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -58,77 +97,91 @@
         </div>
     </nav>
 
-    <div class="container"
-        <header>
-            <h1>📊 Fiscal Auditor</h1>
-            <p>Sistema de Auditoria e Apuração Tributária</p>
-        </header>
-
-        {% if error %}
-        <div class="alert alert-error">
-            <strong>⚠️ Erro:</strong> {{ error }}
-        </div>
-        {% endif %}
-
-        <div class="card">
-            <h2>Consulta de Documentos Fiscais</h2>
-            <p>Consulte e processe documentos fiscais já importados no datalake</p>
-            
-            <form id="uploadForm">
-                <div class="form-group">
-                    <small id="datalake-info"></small>
-                </div>
-
-                <div class="form-group">
-                    <label for="tipo_data">Filtrar por Data de:</label>
-                    <select id="tipo_data" name="tipo_data" required>
-                        <option value="emissao">Emissão</option>
-                        <option value="autorizacao">Autorização</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="data_inicio">Data Início:</label>
-                    <input type="date" id="data_inicio" name="data_inicio" required>
-                    <small>Documentos a partir desta data</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="data_fim">Data Fim:</label>
-                    <input type="date" id="data_fim" name="data_fim" required>
-                    <small>Documentos até esta data</small>
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="submitBtn">
-                    Consultar e Processar
-                </button>
-            </form>
-
-            <div id="loading" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Processando documentos...</p>
-            </div>
-
-            <div id="result" class="result" style="display: none;"></div>
+    <div class="container">
+        <!-- Abas de navegação -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="processar">📁 Processar Documentos</button>
+            <button class="tab-btn" data-tab="relatorios">📈 Relatórios Fase 1</button>
         </div>
 
-        <div class="features">
-            <div class="feature-card">
-                <h3>📁 Classificação</h3>
-                <p>Identificação automática de entradas e saídas</p>
+        <!-- Conteúdo das abas -->
+        <div class="tab-content active" id="tab-processar">
+            <header>
+                <h1>📊 Fiscal Auditor</h1>
+                <p>Sistema de Auditoria e Apuração Tributária</p>
+            </header>
+
+            {% if error %}
+            <div class="alert alert-error">
+                <strong>⚠️ Erro:</strong> {{ error }}
             </div>
-            <div class="feature-card">
-                <h3>✅ Validação</h3>
-                <p>Verificação de conformidade tributária</p>
+            {% endif %}
+
+            <div class="card">
+                <h2>Consulta de Documentos Fiscais</h2>
+                <p>Consulte e processe documentos fiscais já importados no datalake</p>
+                
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <small id="datalake-info"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipo_data">Filtrar por Data de:</label>
+                        <select id="tipo_data" name="tipo_data" required>
+                            <option value="emissao">Emissão</option>
+                            <option value="autorizacao">Autorização</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="data_inicio">Data Início:</label>
+                        <input type="date" id="data_inicio" name="data_inicio" required>
+                        <small>Documentos a partir desta data</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="data_fim">Data Fim:</label>
+                        <input type="date" id="data_fim" name="data_fim" required>
+                        <small>Documentos até esta data</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Consultar e Processar
+                    </button>
+                </form>
+
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Processando documentos...</p>
+                </div>
+
+                <div id="result" class="result" style="display: none;"></div>
             </div>
-            <div class="feature-card">
-                <h3>🧮 Apuração</h3>
-                <p>Cálculo de ICMS, IPI, PIS, COFINS, IBS e CBS</p>
+
+            <div class="features">
+                <div class="feature-card">
+                    <h3>📁 Classificação</h3>
+                    <p>Identificação automática de entradas e saídas</p>
+                </div>
+                <div class="feature-card">
+                    <h3>✅ Validação</h3>
+                    <p>Verificação de conformidade tributária</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🧮 Apuração</h3>
+                    <p>Cálculo de ICMS, IPI, PIS, COFINS, IBS e CBS</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Relatórios</h3>
+                    <p>Geração de demonstrativos e mapas</p>
+                </div>
             </div>
-            <div class="feature-card">
-                <h3>📊 Relatórios</h3>
-                <p>Geração de demonstrativos e mapas</p>
-            </div>
+        </div>
+
+        <!-- Aba de Relatórios Fase 1 -->
+        <div class="tab-content" id="tab-relatorios" style="display: none;">
+            <iframe id="iframe-relatorios" style="width: 100%; height: 1000px; border: none; border-radius: 8px;" frameborder="0"></iframe>
         </div>
     </div>
 
@@ -142,6 +195,31 @@
         if (!token || !empresaId) {
             window.location.href = '/painel';
         }
+
+        // Gerenciar abas
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        let relatorioCarregado = false;
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                // Atualizar botões
+                tabBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Atualizar conteúdo
+                tabContents.forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${tabName}`).classList.add('active');
+                
+                // Carregar relatórios se for a primeira vez
+                if (tabName === 'relatorios' && !relatorioCarregado) {
+                    carregarRelatorios();
+                    relatorioCarregado = true;
+                }
+            });
+        });
 
         // Carregar informações da empresa
         async function carregarEmpresa() {
@@ -174,6 +252,12 @@
         }
 
         carregarEmpresa();
+
+        // Carregar relatórios Fase 1 via iframe
+        function carregarRelatorios() {
+            const iframe = document.getElementById('iframe-relatorios');
+            iframe.src = `/relatorios-fase1?empresa_id=${empresaId}`;
+        }
 
         // Verificar documentos disponíveis no datalake
         async function verificarDatalake() {

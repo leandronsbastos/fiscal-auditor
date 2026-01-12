@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Portal Administrativo ETL{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- KPI Cards -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <i class="fas fa-file-import"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Processos Hoje</div>
+            <div class="kpi-value" id="processesToday">0</div>
+            <div class="kpi-change positive">
+                <i class="fas fa-arrow-up"></i> 12% vs ontem
+            </div>
+        </div>
+    </div>
+    
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Taxa de Sucesso</div>
+            <div class="kpi-value" id="successRate">0%</div>
+            <div class="kpi-change positive">
+                <i class="fas fa-arrow-up"></i> 5% vs média
+            </div>
+        </div>
+    </div>
+    
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Tempo Médio</div>
+            <div class="kpi-value" id="avgDuration">0s</div>
+            <div class="kpi-change negative">
+                <i class="fas fa-arrow-down"></i> 8% vs média
+            </div>
+        </div>
+    </div>
+    
+    <div class="kpi-card">
+        <div class="kpi-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+            <i class="fas fa-calendar-check"></i>
+        </div>
+        <div class="kpi-content">
+            <div class="kpi-label">Jobs Ativos</div>
+            <div class="kpi-value" id="activeJobs">0</div>
+            <div class="kpi-change">
+                <i class="fas fa-minus"></i> Sem alteração
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="charts-grid">
+    <div class="chart-card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-bar"></i> Processos por Hora (24h)</h3>
+            <button class="btn-icon" onclick="refreshChart('processesChart')">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <canvas id="processesChart"></canvas>
+        </div>
+    </div>
+    
+    <div class="chart-card">
+        <div class="card-header">
+            <h3><i class="fas fa-chart-pie"></i> Status dos Processos</h3>
+            <button class="btn-icon" onclick="refreshChart('statusChart')">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+        <div class="card-body">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Processes Table -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-list"></i> Processos Recentes</h3>
+        <button class="btn btn-primary" onclick="window.location.href='/processes'">
+            Ver Todos
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Arquivo</th>
+                        <th>Status</th>
+                        <th>Início</th>
+                        <th>Duração</th>
+                        <th>Registros</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="recentProcesses">
+                    <tr>
+                        <td colspan="7" class="text-center">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Active Jobs -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-calendar-alt"></i> Jobs Agendados Ativos</h3>
+        <button class="btn btn-secondary" onclick="window.location.href='/scheduler'">
+            Gerenciar
+        </button>
+    </div>
+    <div class="card-body">
+        <div id="activeJobsList" class="job-list">
+            <div class="loading">Carregando...</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+<script>
+let processesChart = null;
+let statusChart = null;
+
+// Carregar dados do dashboard
+async function loadDashboardData() {
+    try {
+        // Carregar métricas
+        const metricsRes = await fetch('/api/system/metrics?hours=24');
+        const metricsData = await metricsRes.json();
+        
+        // Atualizar KPIs
+        const totalProcesses = metricsData.processes_by_hour.reduce((sum, p) => sum + p.total, 0);
+        const totalSuccess = metricsData.processes_by_hour.reduce((sum, p) => sum + p.success, 0);
+        const successRate = totalProcesses > 0 ? (totalSuccess / totalProcesses * 100).toFixed(1) : 0;
+        
+        document.getElementById('processesToday').textContent = totalProcesses;
+        document.getElementById('successRate').textContent = successRate + '%';
+        document.getElementById('avgDuration').textContent = metricsData.avg_duration_seconds.toFixed(1) + 's';
+        
+        // Atualizar gráfico de processos por hora
+        updateProcessesChart(metricsData.processes_by_hour);
+        
+        // Atualizar gráfico de status
+        updateStatusChart(totalSuccess, metricsData.processes_by_hour.reduce((sum, p) => sum + p.errors, 0));
+        
+    } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+        showToast('Erro ao carregar dados do dashboard', 'error');
+    }
+}
+
+// Gráfico de processos por hora
+function updateProcessesChart(data) {
+    const ctx = document.getElementById('processesChart');
+    
+    if (processesChart) {
+        processesChart.destroy();
+    }
+    
+    processesChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(p => new Date(p.hour).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})),
+            datasets: [
+                {
+                    label: 'Sucesso',
+                    data: data.map(p => p.success),
+                    borderColor: '#43e97b',
+                    backgroundColor: 'rgba(67, 233, 123, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                },
+                {
+                    label: 'Erros',
+                    data: data.map(p => p.errors),
+                    borderColor: '#f5576c',
+                    backgroundColor: 'rgba(245, 87, 108, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de status
+function updateStatusChart(success, errors) {
+    const ctx = document.getElementById('statusChart');
+    
+    if (statusChart) {
+        statusChart.destroy();
+    }
+    
+    statusChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Sucesso', 'Erros'],
+            datasets: [{
+                data: [success, errors],
+                backgroundColor: ['#43e97b', '#f5576c'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Carregar processos recentes
+async function loadRecentProcesses() {
+    try {
+        const response = await fetch('/api/etl/processes?limit=10');
+        const data = await response.json();
+        
+        const tbody = document.getElementById('recentProcesses');
+        if (data.processes && data.processes.length > 0) {
+            tbody.innerHTML = data.processes.map(p => `
+                <tr>
+                    <td>#${p.id}</td>
+                    <td>${p.filename}</td>
+                    <td><span class="badge badge-${p.status}">${p.status}</span></td>
+                    <td>${new Date(p.start_time).toLocaleString('pt-BR')}</td>
+                    <td>${p.duration_seconds ? p.duration_seconds.toFixed(2) + 's' : '-'}</td>
+                    <td>${p.records_processed}</td>
+                    <td>
+                        <button class="btn-icon" onclick="viewProcess(${p.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Nenhum processo encontrado</td></tr>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar processos:', error);
+    }
+}
+
+// Carregar jobs ativos
+async function loadActiveJobs() {
+    try {
+        const response = await fetch('/api/scheduler/jobs?active=true');
+        const data = await response.json();
+        
+        const container = document.getElementById('activeJobsList');
+        if (data.jobs && data.jobs.length > 0) {
+            container.innerHTML = data.jobs.map(job => `
+                <div class="job-item">
+                    <div class="job-info">
+                        <h4>${job.name}</h4>
+                        <p>Tipo: ${job.job_type} | Próxima execução: ${job.next_run ? new Date(job.next_run).toLocaleString('pt-BR') : 'N/A'}</p>
+                    </div>
+                    <div class="job-stats">
+                        <span class="stat-success">${job.success_count} ✓</span>
+                        <span class="stat-error">${job.failure_count} ✗</span>
+                    </div>
+                </div>
+            `).join('');
+        } else {
+            container.innerHTML = '<p class="text-muted">Nenhum job ativo</p>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar jobs:', error);
+    }
+}
+
+// Inicializar dashboard
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboardData();
+    loadRecentProcesses();
+    loadActiveJobs();
+    
+    // Atualizar a cada 30 segundos
+    setInterval(() => {
+        loadDashboardData();
+        loadRecentProcesses();
+    }, 30000);
+});
+</script>
+{% endblock %}

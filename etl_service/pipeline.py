@@ -183,7 +183,8 @@ class ETLPipeline:
             resultado_carga = self.loader.carregar_nfe(
                 nfe=nfe,
                 arquivo=arquivo,
-                processamento_id=processamento_id
+                processamento_id=processamento_id,
+                dados_emitente=dados_extraidos.get('emitente', {})
             )
             
             resultado.update(resultado_carga)

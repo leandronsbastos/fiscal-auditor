@@ -3,220 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Análise Tributária - Fiscal Auditor</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Análise Tributária - Business Intelligence Fiscal</title>
     <style>
-        .analise-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --border: #e1e4e8;
+            --text-primary: #24292e;
+            --text-secondary: #586069;
+            --text-muted: #6a737d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+        
+        .section-header {
             margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .section-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .kpi-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px 24px;
+            transition: all 0.2s;
+        }
+        
+        .kpi-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #d1d5da;
+        }
+        
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+        
+        .kpi-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .kpi-description {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .produto-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 24px;
         }
         
         .produto-header {
-            border-bottom: 3px solid #667eea;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            padding: 20px 24px;
+            border-bottom: 3px solid var(--accent);
+            background: #f6f8fa;
         }
         
-        .produto-header h3 {
-            color: #333;
-            margin-bottom: 5px;
+        .produto-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .produto-ncm {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .cfop-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .cfop-group {
+            padding: 12px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+        }
+        
+        .cfop-group-title {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
         }
         
         .cfop-tags {
             display: flex;
-            gap: 5px;
+            gap: 6px;
             flex-wrap: wrap;
-            margin-top: 10px;
         }
         
         .cfop-tag {
-            background: #e9ecef;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.85em;
-            color: #495057;
+            padding: 4px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid;
         }
         
         .cfop-valido {
-            border: 2px solid #28a745;
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
         }
         
         .cfop-invalido {
-            border: 2px solid #dc3545;
-            background: #f8d7da !important;
-            color: #721c24 !important;
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
         }
         
         .cfop-invalido::after {
             content: " ⚠️";
         }
         
-        .tributos-comparacao {
+        .tributos-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 16px;
+            padding: 24px;
         }
         
         .tributo-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            border-left: 4px solid #667eea;
+            background: #f6f8fa;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 16px;
+            border-left: 4px solid var(--accent);
         }
         
-        .tributo-card h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.1em;
+        .tributo-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 16px;
         }
         
         .tributo-dados {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .tributo-entrada, .tributo-saida {
+            padding: 12px;
+            border-radius: 4px;
         }
         
         .tributo-entrada {
             background: #d4edda;
-            padding: 10px;
-            border-radius: 5px;
+            border: 1px solid #c3e6cb;
         }
         
         .tributo-saida {
             background: #fff3cd;
-            padding: 10px;
-            border-radius: 5px;
+            border: 1px solid #ffeaa7;
         }
         
         .tributo-label {
-            font-size: 0.8em;
+            font-size: 11px;
             font-weight: 600;
-            color: #666;
-            margin-bottom: 3px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
         }
         
         .tributo-valor {
-            font-size: 1.1em;
-            font-weight: bold;
-            color: #333;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
         }
         
         .tributo-aliquota {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 3px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
         
-        .diferenca-card {
+        .diferenca-box {
             background: #d1ecf1;
-            padding: 12px;
-            border-radius: 5px;
-            margin-top: 10px;
             border: 1px solid #bee5eb;
+            padding: 12px;
+            border-radius: 4px;
         }
         
-        .diferenca-positiva {
-            color: #28a745;
-            font-weight: bold;
+        .diferenca-valor {
+            font-size: 16px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
         }
         
-        .diferenca-negativa {
-            color: #dc3545;
-            font-weight: bold;
+        .diferenca-positiva { color: var(--success); }
+        .diferenca-negativa { color: var(--danger); }
+        
+        .resumo-valores {
+            padding: 20px 24px;
+            background: #f6f8fa;
+            border-top: 1px solid var(--border);
         }
         
-        .sem-movimento {
-            color: #999;
-            font-style: italic;
-            text-align: center;
-            padding: 20px;
+        .resumo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .resumo-item strong {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .resumo-valor {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .resumo-detalhes {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>📊 Fiscal Auditor</h1>
-            <p>Análise Tributária por Produto</p>
-            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                <a href="/dashboard" class="btn btn-secondary">← Dashboard</a>
-                <a href="/produtos" class="btn btn-secondary">📦 Visão por Produto</a>
-                <a href="/" class="btn btn-secondary">Novo Processamento</a>
+        <!-- KPIs -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-label">Total de Produtos</div>
+                <div class="kpi-value">{{ analise.total_produtos }}</div>
+                <div class="kpi-description">NCMs analisados</div>
             </div>
-        </header>
-
-        <!-- Resumo -->
-        <div class="card">
-            <h2>📈 Resumo da Análise</h2>
-            <div class="summary-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                <div class="summary-card">
-                    <h3>Total de Produtos</h3>
-                    <div class="summary-value">{{ analise.total_produtos }}</div>
-                    <small>NCMs analisados</small>
-                </div>
-                <div class="summary-card">
-                    <h3>Data da Análise</h3>
-                    <div class="summary-value" style="font-size: 1.2em;">
-                        {{ analise.data_geracao[:10] }}
-                    </div>
-                    <small>{{ analise.data_geracao[11:19] }}</small>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Data da Análise</div>
+                <div class="kpi-value" style="font-size: 20px;">{{ analise.data_geracao[:10] }}</div>
+                <div class="kpi-description">{{ analise.data_geracao[11:19] }}</div>
             </div>
         </div>
 
-        <!-- Análise por Produto -->
+        <div class="section-header">
+            <h2 class="section-title">Análise Tributária Detalhada por Produto</h2>
+            <p class="section-description">Comparação de CFOPs e tributos entre entradas e saídas</p>
+        </div>
+
+        <!-- Produtos -->
         {% for produto in analise.produtos %}
-        <div class="analise-card">
+        <div class="produto-card">
             <div class="produto-header">
-                <h3>{{ produto.descricao }}</h3>
-                <p style="color: #666; margin: 5px 0;">
-                    <strong>NCM:</strong> {{ produto.ncm }}
-                </p>
+                <h3 class="produto-title">{{ produto.descricao }}</h3>
+                <p class="produto-ncm"><strong>NCM:</strong> {{ produto.ncm }}</p>
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
-                    <div>
-                        <strong style="color: #28a745;">📥 CFOPs de Entrada:</strong>
+                <div class="cfop-section">
+                    <div class="cfop-group">
+                        <div class="cfop-group-title" style="color: var(--success);">📥 CFOPs de Entrada</div>
                         <div class="cfop-tags">
                             {% for cfop in produto.cfop_entradas %}
                             {% set primeiro_digito = cfop[0] if cfop else '' %}
                             {% set cfop_valido = primeiro_digito in ['1', '2', '3'] %}
                             <span class="cfop-tag {% if cfop_valido %}cfop-valido{% else %}cfop-invalido{% endif %}" 
-                                  style="background: #d4edda; color: #155724;"
-                                  title="{% if cfop_valido %}CFOP correto para entrada{% else %}ATENÇÃO: CFOP inválido para entrada! CFOPs de entrada devem começar com 1, 2 ou 3{% endif %}">
+                                  title="{% if cfop_valido %}CFOP correto para entrada{% else %}ATENÇÃO: CFOP inválido para entrada!{% endif %}">
                                 {{ cfop }}
                             </span>
                             {% endfor %}
                             {% if not produto.cfop_entradas %}
-                            <span style="color: #999; font-style: italic;">Sem entradas</span>
+                            <span style="color: var(--text-muted); font-style: italic; font-size: 12px;">Sem entradas</span>
                             {% endif %}
                         </div>
                     </div>
-                    <div>
-                        <strong style="color: #dc3545;">📤 CFOPs de Saída:</strong>
+                    <div class="cfop-group">
+                        <div class="cfop-group-title" style="color: var(--danger);">📤 CFOPs de Saída</div>
                         <div class="cfop-tags">
                             {% for cfop in produto.cfop_saidas %}
                             {% set primeiro_digito = cfop[0] if cfop else '' %}
                             {% set cfop_valido = primeiro_digito in ['5', '6', '7'] %}
                             <span class="cfop-tag {% if cfop_valido %}cfop-valido{% else %}cfop-invalido{% endif %}" 
-                                  style="background: #fff3cd; color: #856404;"
-                                  title="{% if cfop_valido %}CFOP correto para saída{% else %}ATENÇÃO: CFOP inválido para saída! CFOPs de saída devem começar com 5, 6 ou 7{% endif %}">
+                                  title="{% if cfop_valido %}CFOP correto para saída{% else %}ATENÇÃO: CFOP inválido para saída!{% endif %}">
                                 {{ cfop }}
                             </span>
                             {% endfor %}
                             {% if not produto.cfop_saidas %}
-                            <span style="color: #999; font-style: italic;">Sem saídas</span>
+                            <span style="color: var(--text-muted); font-style: italic; font-size: 12px;">Sem saídas</span>
                             {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Comparação Tributária -->
-            <div class="tributos-comparacao">
+            <div class="tributos-grid">
                 {% for tributo in ['ICMS', 'IPI', 'PIS', 'COFINS', 'IBS', 'CBS'] %}
                 {% set analise_trib = produto.analise_tributaria[tributo] %}
                 {% set credito = analise_trib.credito|float %}
@@ -224,11 +364,11 @@
                 
                 {% if credito > 0 or debito > 0 %}
                 <div class="tributo-card">
-                    <h4>{{ tributo }}</h4>
+                    <h4 class="tributo-title">{{ tributo }}</h4>
                     
                     <div class="tributo-dados">
                         <div class="tributo-entrada">
-                            <div class="tributo-label">📥 Crédito (Entrada)</div>
+                            <div class="tributo-label">📥 Crédito</div>
                             <div class="tributo-valor">R$ {{ "%.2f"|format(credito) }}</div>
                             <div class="tributo-aliquota">
                                 Alíq. média: {{ "%.2f"|format(analise_trib.percentual_entrada|float) }}%
@@ -236,7 +376,7 @@
                         </div>
                         
                         <div class="tributo-saida">
-                            <div class="tributo-label">📤 Débito (Saída)</div>
+                            <div class="tributo-label">📤 Débito</div>
                             <div class="tributo-valor">R$ {{ "%.2f"|format(debito) }}</div>
                             <div class="tributo-aliquota">
                                 Alíq. média: {{ "%.2f"|format(analise_trib.percentual_saida|float) }}%
@@ -244,19 +384,15 @@
                         </div>
                     </div>
                     
-                    <div class="diferenca-card">
-                        <div class="tributo-label">💰 Diferença (Crédito - Débito)</div>
+                    <div class="diferenca-box">
+                        <div class="tributo-label">💰 Diferença</div>
                         {% set diferenca = analise_trib.diferenca|float %}
-                        <div style="font-size: 1.2em;">
-                            <span class="{% if diferenca > 0 %}diferenca-positiva{% elif diferenca < 0 %}diferenca-negativa{% endif %}">
-                                R$ {{ "%.2f"|format(diferenca|abs) }}
-                            </span>
+                        <div class="diferenca-valor {% if diferenca > 0 %}diferenca-positiva{% elif diferenca < 0 %}diferenca-negativa{% endif %}">
+                            R$ {{ "%.2f"|format(diferenca|abs) }}
                             {% if diferenca > 0 %}
-                            <small style="color: #28a745;">(Crédito a aproveitar)</small>
+                            <small style="font-size: 11px;">(Crédito)</small>
                             {% elif diferenca < 0 %}
-                            <small style="color: #dc3545;">(A recolher)</small>
-                            {% else %}
-                            <small style="color: #666;">(Neutro)</small>
+                            <small style="font-size: 11px;">(A recolher)</small>
                             {% endif %}
                         </div>
                     </div>
@@ -265,110 +401,28 @@
                 {% endfor %}
             </div>
 
-            <!-- Resumo de Valores -->
-            <div style="margin-top: 20px; padding: 15px; background: #f1f3f5; border-radius: 8px;">
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div>
-                        <strong style="color: #28a745;">📥 Total Entradas:</strong>
-                        <div style="font-size: 1.2em; color: #333; margin-top: 5px;">
-                            R$ {{ "%.2f"|format(produto.entradas.valor_total|float) }}
-                        </div>
-                        <small style="color: #666;">
+            <div class="resumo-valores">
+                <div class="resumo-grid">
+                    <div class="resumo-item">
+                        <strong style="color: var(--success);">📥 Total Entradas</strong>
+                        <div class="resumo-valor">R$ {{ "%.2f"|format(produto.entradas.valor_total|float) }}</div>
+                        <div class="resumo-detalhes">
                             Qtd: {{ "%.2f"|format(produto.entradas.quantidade|float) }} | 
                             Docs: {{ produto.entradas.documentos }}
-                        </small>
-                    </div>
-                    <div>
-                        <strong style="color: #dc3545;">📤 Total Saídas:</strong>
-                        <div style="font-size: 1.2em; color: #333; margin-top: 5px;">
-                            R$ {{ "%.2f"|format(produto.saidas.valor_total|float) }}
                         </div>
-                        <small style="color: #666;">
+                    </div>
+                    <div class="resumo-item">
+                        <strong style="color: var(--danger);">📤 Total Saídas</strong>
+                        <div class="resumo-valor">R$ {{ "%.2f"|format(produto.saidas.valor_total|float) }}</div>
+                        <div class="resumo-detalhes">
                             Qtd: {{ "%.2f"|format(produto.saidas.quantidade|float) }} | 
                             Docs: {{ produto.saidas.documentos }}
-                        </small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
-
-        <!-- Exportar Relatórios -->
-        <div class="card">
-            <h2>📥 Exportar Relatórios</h2>
-            <div class="relatorios-grid">
-                <button onclick="exportarExcel()" class="relatorio-link" style="border: none; cursor: pointer;">
-                    <span class="icon">📊</span>
-                    <span>Exportar para Excel</span>
-                </button>
-                <button onclick="exportarPDF()" class="relatorio-link" style="border: none; cursor: pointer;">
-                    <span class="icon">📄</span>
-                    <span>Exportar para PDF</span>
-                </button>
-            </div>
-        </div>
     </div>
-
-    <footer>
-        <p>Fiscal Auditor © 2026 - Análise Tributária Detalhada</p>
-    </footer>
-
-    <script>
-        async function exportarExcel() {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/export/excel', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `relatorio_fiscal_${new Date().toISOString().split('T')[0]}.xlsx`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                } else {
-                    alert('Erro ao exportar para Excel');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao exportar para Excel');
-            }
-        }
-
-        async function exportarPDF() {
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch('/api/export/pdf', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const blob = await response.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `relatorio_fiscal_${new Date().toISOString().split('T')[0]}.pdf`;
-                    document.body.appendChild(a);
-                    a.click();
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                } else {
-                    alert('Erro ao exportar para PDF');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao exportar para PDF');
-            }
-        }
-    </script>
 </body>
 </html>

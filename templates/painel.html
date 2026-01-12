@@ -105,10 +105,33 @@
             border-radius: 5px;
             text-align: center;
             transition: transform 0.2s;
+            margin-right: 5px;
         }
 
         .btn-acessar:hover {
             transform: translateY(-2px);
+        }
+
+        .btn-relatorios {
+            display: inline-block;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            transition: transform 0.2s;
+            font-size: 14px;
+        }
+
+        .btn-relatorios:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .welcome-section {
@@ -235,7 +258,9 @@
                         <div class="empresa-cnpj">CNPJ: ${formatarCNPJ(empresa.cnpj)}</div>
                         <div class="empresa-nome">${empresa.razao_social}</div>
                         ${empresa.nome_fantasia ? `<div class="empresa-cnpj">${empresa.nome_fantasia}</div>` : ''}
-                        <a href="/?empresa_id=${empresa.id}" class="btn-acessar">Acessar Sistema</a>
+                        <div class="btn-group">
+                            <a href="/bi-fiscal?empresa_id=${empresa.id}" class="btn-acessar">🎯 Business Intelligence Fiscal</a>
+                        </div>
                     </div>
                 `).join('');
 

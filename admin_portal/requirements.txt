@@ -1,0 +1,23 @@
+# Portal Administrativo ETL - Requirements
+
+# Flask e extensões
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
+Flask-CORS==4.0.0
+
+# Scheduler
+APScheduler==3.10.4
+
+# Banco de dados
+psycopg2-binary==2.9.9
+SQLAlchemy==2.0.23
+
+# Monitoramento e métricas
+psutil==5.9.6
+
+# Logging e debugging
+python-json-logger==2.0.7
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2023.3

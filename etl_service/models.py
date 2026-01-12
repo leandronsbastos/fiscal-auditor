@@ -335,6 +335,17 @@ class NFeItem(Base):
     aliquota_cbs = Column(Numeric(5, 4))
     valor_cbs = Column(Numeric(15, 2))
     
+    # ICMS Monofásico (NT 2023.003)
+    quantidade_bc_mono = Column(Numeric(15, 4))  # Quantidade tributada ICMS monofásico próprio
+    valor_icms_mono = Column(Numeric(15, 2))  # Valor ICMS monofásico próprio
+    aliquota_adrem_mono = Column(Numeric(15, 4))  # Alíquota ad rem ICMS monofásico próprio
+    quantidade_bc_mono_reten = Column(Numeric(15, 4))  # Quantidade tributada ICMS monofásico sujeito a retenção
+    valor_icms_mono_reten = Column(Numeric(15, 2))  # Valor ICMS monofásico sujeito a retenção
+    aliquota_adrem_mono_reten = Column(Numeric(15, 4))  # Alíquota ad rem ICMS monofásico sujeito a retenção
+    quantidade_bc_mono_ret = Column(Numeric(15, 4))  # Quantidade tributada ICMS monofásico retido anteriormente
+    valor_icms_mono_ret = Column(Numeric(15, 2))  # Valor ICMS monofásico retido anteriormente
+    aliquota_adrem_mono_ret = Column(Numeric(15, 4))  # Alíquota ad rem ICMS monofásico retido anteriormente
+    
     # Importação
     numero_di = Column(String(20))  # Declaração de Importação
     data_di = Column(Date)

@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Processos ETL - Portal ETL{% endblock %}
+{% block page_title %}Processos ETL{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-tasks"></i> Processos Executados</h3>
+        <div style="display: flex; gap: 12px;">
+            <select id="statusFilter" onchange="loadProcesses()" class="form-input" style="width: 150px;">
+                <option value="">Todos</option>
+                <option value="success">Sucesso</option>
+                <option value="error">Erro</option>
+                <option value="processing">Processando</option>
+                <option value="pending">Pendente</option>
+            </select>
+            <button class="btn btn-secondary" onclick="loadProcesses()">
+                <i class="fas fa-sync"></i> Atualizar
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="processesTable">
+            <p style="text-align: center; padding: 40px; color: #999;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando processos...
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadProcesses() {
+    try {
+        const status = document.getElementById('statusFilter').value;
+        const url = `/api/etl/processes${status ? '?status=' + status : ''}`;
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const processes = await response.json();
+            displayProcesses(processes);
+        } else {
+            document.getElementById('processesTable').innerHTML = 
+                '<p style="text-align: center; padding: 40px; color: #999;">Nenhum processo encontrado</p>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar processos:', error);
+        document.getElementById('processesTable').innerHTML = 
+            '<p style="text-align: center; padding: 40px; color: #f5576c;">Erro ao carregar processos</p>';
+    }
+}
+
+function displayProcesses(processes) {
+    const container = document.getElementById('processesTable');
+    
+    if (!processes || processes.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 40px; color: #999;">Nenhum processo encontrado</p>';
+        return;
+    }
+    
+    let html = '<table class="data-table"><thead><tr>';
+    html += '<th>Arquivo</th>';
+    html += '<th>Status</th>';
+    html += '<th>Início</th>';
+    html += '<th>Duração</th>';
+    html += '<th>Registros</th>';
+    html += '<th>Ações</th>';
+    html += '</tr></thead><tbody>';
+    
+    processes.forEach(proc => {
+        const statusClass = proc.status === 'success' ? 'badge-success' : 
+                          proc.status === 'error' ? 'badge-error' : 
+                          proc.status === 'processing' ? 'badge-info' : 'badge-warning';
+        
+        const statusLabel = proc.status === 'success' ? 'Sucesso' :
+                           proc.status === 'error' ? 'Erro' :
+                           proc.status === 'processing' ? 'Processando' : 'Pendente';
+        
+        html += `<tr>
+            <td><strong>${proc.filename}</strong></td>
+            <td><span class="badge ${statusClass}">${statusLabel}</span></td>
+            <td>${formatDate(proc.start_time)}</td>
+            <td>${proc.duration_seconds ? formatDuration(proc.duration_seconds) : '-'}</td>
+            <td>${proc.records_processed || 0}</td>
+            <td>
+                <button class="btn btn-sm btn-primary" onclick="viewProcessDetails(${proc.id})">
+                    <i class="fas fa-eye"></i> Detalhes
+                </button>
+            </td>
+        </tr>`;
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function viewProcessDetails(id) {
+    fetch(`/api/etl/processes/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showToast(data.error, 'error');
+            } else {
+                showProcessModal(data);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar detalhes:', error);
+            showToast('Erro ao carregar detalhes do processo', 'error');
+        });
+}
+
+function showProcessModal(process) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.display = 'block';
+    
+    const errorMsg = process.error_message ? 
+        `<div style="background: #ffe6e6; padding: 15px; border-radius: 4px; margin-top: 15px;">
+            <strong style="color: #d32f2f;">Erro:</strong><br>
+            <pre style="margin: 10px 0 0 0; white-space: pre-wrap;">${process.error_message}</pre>
+        </div>` : '';
+    
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>Detalhes do Processo</h3>
+                <span class="close" onclick="this.closest('.modal').remove()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr><td style="padding: 8px; font-weight: bold;">Arquivo:</td><td style="padding: 8px;">${process.filename}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Status:</td><td style="padding: 8px;">${process.status}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Início:</td><td style="padding: 8px;">${formatDate(process.start_time)}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Fim:</td><td style="padding: 8px;">${process.end_time ? formatDate(process.end_time) : '-'}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Duração:</td><td style="padding: 8px;">${process.duration_seconds ? formatDuration(process.duration_seconds) : '-'}</td></tr>
+                    <tr><td style="padding: 8px; font-weight: bold;">Registros:</td><td style="padding: 8px;">${process.records_processed || 0}</td></tr>
+                </table>
+                ${errorMsg}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">Fechar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Fechar ao clicar fora
+    modal.onclick = function(event) {
+        if (event.target == modal) {
+            modal.remove();
+        }
+    }
+}
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProcesses();
+    setInterval(loadProcesses, 30000); // Atualizar a cada 30 segundos
+});
+</script>
+
+<style>
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    background: var(--card-bg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.data-table tbody tr:hover {
+    background: var(--hover-color);
+}
+
+.badge-info {
+    background: #17a2b8;
+}
+
+.badge-warning {
+    background: #ffc107;
+    color: #000;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,600 @@
+{% extends "base.html" %}
+
+{% block title %}Configuração de Pastas - Portal ETL{% endblock %}
+{% block page_title %}Configuração de Pastas{% endblock %}
+
+{% block content %}
+<!-- Status Card -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-hdd"></i> Status do Sistema de Arquivos</h3>
+        <button class="btn btn-primary" onclick="testPermissions()">
+            <i class="fas fa-check"></i> Testar Permissões
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Espaço Disponível</div>
+                    <div class="kpi-value" id="diskSpace">-</div>
+                </div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <i class="fas fa-file-import"></i>
+                </div>
+                <div class="kpi-content">
+                    <div class="kpi-label">Arquivos na Fila</div>
+                    <div class="kpi-value" id="filesInQueue">-</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Configuration Form -->
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-cog"></i> Configuração de Diretórios</h3>
+    </div>
+    <div class="card-body">
+        <form id="folderConfigForm" onsubmit="saveFolderConfig(event)">
+            <div class="form-group">
+                <label><i class="fas fa-inbox"></i> Pasta de Entrada</label>
+                <p class="form-help">Diretório onde os arquivos XML serão depositados para processamento</p>
+                <div class="input-group">
+                    <input type="text" id="inputPath" class="form-input" placeholder="C:\ETL\Input" required>
+                    <button type="button" class="btn btn-secondary" onclick="browsePath('inputPath')">
+                        <i class="fas fa-folder-open"></i> Procurar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-sync"></i> Pasta de Processamento</label>
+                <p class="form-help">Diretório temporário durante o processamento dos arquivos</p>
+                <div class="input-group">
+                    <input type="text" id="processingPath" class="form-input" placeholder="C:\ETL\Processing" required>
+                    <button type="button" class="btn btn-secondary" onclick="browsePath('processingPath')">
+                        <i class="fas fa-folder-open"></i> Procurar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-check-circle"></i> Pasta de Sucesso</label>
+                <p class="form-help">Diretório para arquivos processados com sucesso</p>
+                <div class="input-group">
+                    <input type="text" id="successPath" class="form-input" placeholder="C:\ETL\Success" required>
+                    <button type="button" class="btn btn-secondary" onclick="browsePath('successPath')">
+                        <i class="fas fa-folder-open"></i> Procurar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-exclamation-circle"></i> Pasta de Erros</label>
+                <p class="form-help">Diretório para arquivos que falharam no processamento</p>
+                <div class="input-group">
+                    <input type="text" id="errorPath" class="form-input" placeholder="C:\ETL\Error" required>
+                    <button type="button" class="btn btn-secondary" onclick="browsePath('errorPath')">
+                        <i class="fas fa-folder-open"></i> Procurar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-ban"></i> Pasta de Rejeitados (Opcional)</label>
+                <p class="form-help">Diretório para arquivos rejeitados (formato inválido, etc.)</p>
+                <div class="input-group">
+                    <input type="text" id="rejectedPath" class="form-input" placeholder="C:\ETL\Rejected">
+                    <button type="button" class="btn btn-secondary" onclick="browsePath('rejectedPath')">
+                        <i class="fas fa-folder-open"></i> Procurar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Configurações
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="loadFolderConfig()">
+                    <i class="fas fa-undo"></i> Resetar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Permission Test Results -->
+<div id="permissionResults" class="card" style="display: none;">
+    <div class="card-header">
+        <h3><i class="fas fa-shield-alt"></i> Resultado do Teste de Permissões</h3>
+    </div>
+    <div class="card-body">
+        <div id="permissionResultsContent"></div>
+    </div>
+</div>
+
+<!-- Modal de Navegação de Pastas -->
+<div id="folderBrowserModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-folder-open"></i> Selecionar Pasta</h3>
+            <button class="btn-close" onclick="closeBrowser()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="browser-toolbar">
+                <div class="current-path">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="currentPathDisplay">Carregando...</span>
+                </div>
+                <button class="btn btn-sm btn-secondary" onclick="createNewFolder()">
+                    <i class="fas fa-plus"></i> Nova Pasta
+                </button>
+            </div>
+            <div id="folderList" class="folder-list">
+                <p style="text-align: center; padding: 20px;">Carregando...</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="selectCurrentFolder()">
+                <i class="fas fa-check"></i> Selecionar Esta Pasta
+            </button>
+            <button class="btn btn-secondary" onclick="closeBrowser()">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.form-help {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.form-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.permission-item {
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.permission-success {
+    background: rgba(67, 233, 123, 0.1);
+    border: 1px solid var(--success-color);
+}
+
+.permission-error {
+    background: rgba(245, 87, 108, 0.1);
+    border: 1px solid var(--danger-color);
+}
+
+/* Modal de Navegação */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.btn-close:hover {
+    background: var(--hover-color);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 24px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.browser-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: var(--card-bg);
+    border-radius: 8px;
+}
+
+.current-path {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.folder-list {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.folder-item {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.folder-item:last-child {
+    border-bottom: none;
+}
+
+.folder-item:hover {
+    background: var(--hover-color);
+}
+
+.folder-item i {
+    font-size: 18px;
+}
+
+.folder-item span {
+    flex: 1;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+</style>
+
+<script>
+// Carregar configuração atual
+async function loadFolderConfig() {
+    try {
+        const response = await fetch('/api/folders/config');
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('inputPath').value = data.input_path || '';
+            document.getElementById('processingPath').value = data.processing_path || '';
+            document.getElementById('successPath').value = data.success_path || '';
+            document.getElementById('errorPath').value = data.error_path || '';
+            document.getElementById('rejectedPath').value = data.rejected_path || '';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar configuração:', error);
+    }
+}
+
+// Salvar configuração
+async function saveFolderConfig(event) {
+    event.preventDefault();
+    
+    const config = {
+        input_path: document.getElementById('inputPath').value,
+        processing_path: document.getElementById('processingPath').value,
+        success_path: document.getElementById('successPath').value,
+        error_path: document.getElementById('errorPath').value,
+        rejected_path: document.getElementById('rejectedPath').value
+    };
+    
+    try {
+        showLoading();
+        const response = await fetch('/api/folders/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(config)
+        });
+        
+        hideLoading();
+        
+        if (response.ok) {
+            showToast('Configuração salva com sucesso', 'success');
+        } else {
+            const error = await response.json();
+            throw new Error(error.error || 'Erro ao salvar configuração');
+        }
+    } catch (error) {
+        hideLoading();
+        showToast(error.message, 'error');
+    }
+}
+
+// Testar permissões
+async function testPermissions() {
+    const config = {
+        input_path: document.getElementById('inputPath').value,
+        processing_path: document.getElementById('processingPath').value,
+        success_path: document.getElementById('successPath').value,
+        error_path: document.getElementById('errorPath').value
+    };
+    
+    try {
+        showLoading();
+        const response = await fetch('/api/folders/test-permissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(config)
+        });
+        
+        hideLoading();
+        
+        if (response.ok) {
+            const results = await response.json();
+            displayPermissionResults(results);
+        } else {
+            throw new Error('Erro ao testar permissões');
+        }
+    } catch (error) {
+        hideLoading();
+        showToast(error.message, 'error');
+    }
+}
+
+// Exibir resultados de permissões
+function displayPermissionResults(results) {
+    const container = document.getElementById('permissionResultsContent');
+    const resultsDiv = document.getElementById('permissionResults');
+    
+    let html = '';
+    for (const [key, result] of Object.entries(results)) {
+        const label = key.replace('_path', '').replace('_', ' ').toUpperCase();
+        const success = result.exists && result.readable && result.writable;
+        const cssClass = success ? 'permission-success' : 'permission-error';
+        const icon = success ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        html += `
+            <div class="permission-item ${cssClass}">
+                <i class="fas ${icon}"></i>
+                <div>
+                    <strong>${label}</strong><br>
+                    <small>Existe: ${result.exists ? '✓' : '✗'} | 
+                           Leitura: ${result.readable ? '✓' : '✗'} | 
+                           Escrita: ${result.writable ? '✓' : '✗'}</small>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    resultsDiv.style.display = 'block';
+}
+
+// ==================== NAVEGAÇÃO DE PASTAS ====================
+
+let currentBrowsePath = '';
+let currentTargetField = '';
+
+// Abrir modal de navegação
+async function browsePath(fieldId) {
+    currentTargetField = fieldId;
+    const currentValue = document.getElementById(fieldId).value;
+    currentBrowsePath = currentValue || '';
+    
+    document.getElementById('folderBrowserModal').style.display = 'flex';
+    await loadFolderList(currentBrowsePath);
+}
+
+// Fechar modal
+function closeBrowser() {
+    document.getElementById('folderBrowserModal').style.display = 'none';
+}
+
+// Carregar lista de pastas
+async function loadFolderList(path) {
+    try {
+        const response = await fetch('/api/folders/browse', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: path })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Erro ao carregar pastas');
+        }
+        
+        const data = await response.json();
+        currentBrowsePath = data.current;
+        displayFolderList(data);
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// Exibir lista de pastas
+function displayFolderList(data) {
+    const pathDisplay = document.getElementById('currentPathDisplay');
+    const folderList = document.getElementById('folderList');
+    
+    pathDisplay.textContent = data.current || 'Selecione um drive';
+    
+    let html = '';
+    
+    // Botão voltar
+    if (data.parent !== null) {
+        html += `
+            <div class="folder-item" onclick="loadFolderList('${data.parent.replace(/\\/g, '\\\\')}')">
+                <i class="fas fa-level-up-alt" style="color: #667eea;"></i>
+                <span>..</span>
+            </div>
+        `;
+    }
+    
+    // Listar pastas
+    data.items.forEach(item => {
+        const icon = item.type === 'drive' ? 'fa-hdd' : 'fa-folder';
+        const color = item.type === 'drive' ? '#f093fb' : '#4facfe';
+        const accessible = item.accessible !== false;
+        const opacity = accessible ? '1' : '0.5';
+        const cursor = accessible ? 'pointer' : 'not-allowed';
+        
+        if (accessible || item.type === 'drive') {
+            html += `
+                <div class="folder-item" style="opacity: ${opacity}; cursor: ${cursor};" 
+                     onclick="loadFolderList('${item.path.replace(/\\/g, '\\\\')}')">
+                    <i class="fas ${icon}" style="color: ${color};"></i>
+                    <span>${item.name}</span>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="folder-item" style="opacity: ${opacity}; cursor: ${cursor};">
+                    <i class="fas ${icon}" style="color: ${color};"></i>
+                    <span>${item.name} <small>(sem permissão)</small></span>
+                </div>
+            `;
+        }
+    });
+    
+    if (data.items.length === 0) {
+        html = '<p style="text-align: center; color: #999; padding: 20px;">Pasta vazia</p>';
+    }
+    
+    folderList.innerHTML = html;
+}
+
+// Selecionar pasta atual
+function selectCurrentFolder() {
+    if (currentBrowsePath) {
+        document.getElementById(currentTargetField).value = currentBrowsePath;
+        closeBrowser();
+        showToast('Pasta selecionada com sucesso', 'success');
+    } else {
+        showToast('Selecione uma pasta válida', 'warning');
+    }
+}
+
+// Criar nova pasta
+async function createNewFolder() {
+    const folderName = prompt('Nome da nova pasta:');
+    if (folderName) {
+        const newPath = currentBrowsePath ? `${currentBrowsePath}\\${folderName}` : folderName;
+        
+        try {
+            const response = await fetch('/api/folders/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: newPath })
+            });
+            
+            if (response.ok) {
+                showToast('Pasta criada com sucesso', 'success');
+                await loadFolderList(currentBrowsePath);
+            } else {
+                const error = await response.json();
+                throw new Error(error.error);
+            }
+        } catch (error) {
+            showToast(error.message, 'error');
+        }
+    }
+}
+
+// Carregar ao iniciar
+document.addEventListener('DOMContentLoaded', () => {
+    loadFolderConfig();
+});
+</script>
+{% endblock %}

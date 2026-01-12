@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Configurações - Portal ETL{% endblock %}
+{% block page_title %}Configurações do Sistema{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-cog"></i> Configurações Gerais</h3>
+    </div>
+    <div class="card-body">
+        <form id="settingsForm" onsubmit="saveSettings(event)">
+            <div class="form-group">
+                <label><i class="fas fa-database"></i> Conexão com Banco de Dados</label>
+                <input type="text" id="dbConnection" class="form-input" placeholder="postgresql://user:pass@localhost:5432/db" readonly>
+                <p class="form-help">String de conexão configurada no ambiente</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-clock"></i> Timeout de Processos (segundos)</label>
+                <input type="number" id="processTimeout" class="form-input" value="3600" min="60">
+                <p class="form-help">Tempo máximo de execução de um processo ETL</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-redo"></i> Tentativas de Retry</label>
+                <input type="number" id="retryCount" class="form-input" value="3" min="0" max="10">
+                <p class="form-help">Número de tentativas em caso de falha</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-pause"></i> Delay entre Retries (segundos)</label>
+                <input type="number" id="retryDelay" class="form-input" value="60" min="10">
+                <p class="form-help">Tempo de espera entre tentativas</p>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-bell"></i> Notificações</label>
+                <div style="display: flex; gap: 20px;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="notifySuccess"> Notificar em sucesso
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="notifyError" checked> Notificar em erro
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email para Notificações</label>
+                <input type="email" id="notificationEmail" class="form-input" placeholder="admin@empresa.com">
+                <p class="form-help">Email que receberá as notificações</p>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Salvar Configurações
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="loadSettings()">
+                    <i class="fas fa-undo"></i> Resetar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-info-circle"></i> Informações do Sistema</h3>
+    </div>
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <i class="fas fa-server"></i>
+                <div>
+                    <strong>Versão do Sistema</strong>
+                    <p>Portal ETL v1.0.0</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-python"></i>
+                <div>
+                    <strong>Python</strong>
+                    <p id="pythonVersion">-</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-database"></i>
+                <div>
+                    <strong>PostgreSQL</strong>
+                    <p id="dbVersion">-</p>
+                </div>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <strong>Uptime</strong>
+                    <p id="uptime">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function loadSettings() {
+    showToast('Configurações carregadas', 'success');
+}
+
+async function saveSettings(event) {
+    event.preventDefault();
+    
+    const settings = {
+        process_timeout: document.getElementById('processTimeout').value,
+        retry_count: document.getElementById('retryCount').value,
+        retry_delay: document.getElementById('retryDelay').value,
+        notify_success: document.getElementById('notifySuccess').checked,
+        notify_error: document.getElementById('notifyError').checked,
+        notification_email: document.getElementById('notificationEmail').value
+    };
+    
+    showToast('Configurações salvas com sucesso!', 'success');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+});
+</script>
+
+<style>
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.info-item i {
+    font-size: 32px;
+    color: var(--primary-color);
+}
+
+.info-item strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.info-item p {
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+</style>
+{% endblock %}

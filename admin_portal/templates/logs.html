@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Logs do Sistema - Portal ETL{% endblock %}
+{% block page_title %}Logs do Sistema{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3><i class="fas fa-file-alt"></i> Logs em Tempo Real</h3>
+        <div style="display: flex; gap: 12px;">
+            <select id="levelFilter" onchange="loadLogs()" class="form-input" style="width: 120px;">
+                <option value="">Todos</option>
+                <option value="DEBUG">Debug</option>
+                <option value="INFO">Info</option>
+                <option value="WARNING">Warning</option>
+                <option value="ERROR">Error</option>
+                <option value="CRITICAL">Critical</option>
+            </select>
+            <button class="btn btn-secondary" onclick="loadLogs()">
+                <i class="fas fa-sync"></i> Atualizar
+            </button>
+            <button class="btn btn-primary" onclick="exportLogs()">
+                <i class="fas fa-download"></i> Exportar
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div id="logsContainer" style="background: #1e1e1e; color: #d4d4d4; padding: 20px; border-radius: 8px; max-height: 600px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 13px;">
+            <p style="text-align: center; padding: 20px;">
+                <i class="fas fa-spinner fa-spin"></i> Carregando logs...
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function loadLogs() {
+    try {
+        const level = document.getElementById('levelFilter').value;
+        const url = `/api/logs${level ? '?level=' + level : ''}`;
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const logs = await response.json();
+            displayLogs(logs);
+        } else {
+            document.getElementById('logsContainer').innerHTML = 
+                '<p style="text-align: center; padding: 20px;">Nenhum log encontrado</p>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar logs:', error);
+        document.getElementById('logsContainer').innerHTML = 
+            '<p style="text-align: center; padding: 20px; color: #f48771;">Erro ao carregar logs</p>';
+    }
+}
+
+function displayLogs(logs) {
+    const container = document.getElementById('logsContainer');
+    
+    if (!logs || logs.length === 0) {
+        container.innerHTML = '<p style="text-align: center; padding: 20px;">Nenhum log encontrado</p>';
+        return;
+    }
+    
+    let html = '';
+    logs.forEach(log => {
+        const color = log.level === 'ERROR' || log.level === 'CRITICAL' ? '#f48771' :
+                     log.level === 'WARNING' ? '#dcdcaa' :
+                     log.level === 'INFO' ? '#4fc1ff' :
+                     log.level === 'DEBUG' ? '#b5cea8' : '#d4d4d4';
+        
+        html += `<div style="margin-bottom: 8px; border-left: 3px solid ${color}; padding-left: 12px;">
+            <span style="color: #858585;">[${formatDate(log.timestamp)}]</span>
+            <span style="color: ${color}; font-weight: bold;">${log.level}</span>
+            <span style="color: #9cdcfe;">${log.module}</span>
+            ${log.function_name ? `<span style="color: #dcdcaa;">.${log.function_name}()</span>` : ''}
+            <span style="color: #ce9178;">: ${log.message}</span>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
+    container.scrollTop = container.scrollHeight; // Scroll para o final
+}
+
+async function exportLogs() {
+    try {
+        const level = document.getElementById('levelFilter').value;
+        const url = `/api/logs${level ? '?level=' + level : ''}`;
+        
+        const response = await fetch(url);
+        if (response.ok) {
+            const logs = await response.json();
+            
+            if (!logs || logs.length === 0) {
+                showToast('Nenhum log para exportar', 'warning');
+                return;
+            }
+            
+            // Criar CSV
+            let csv = 'Timestamp,Level,Module,Function,Message\n';
+            logs.forEach(log => {
+                const row = [
+                    formatDate(log.timestamp),
+                    log.level,
+                    log.module,
+                    log.function_name || '',
+                    `"${log.message.replace(/"/g, '""')}"`
+                ].join(',');
+                csv += row + '\n';
+            });
+            
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url_obj = URL.createObjectURL(blob);
+            link.href = url_obj;
+            link.download = `logs_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            URL.revokeObjectURL(url_obj);
+            
+            showToast('Logs exportados com sucesso', 'success');
+        }
+    } catch (error) {
+        console.error('Erro ao exportar logs:', error);
+        showToast('Erro ao exportar logs', 'error');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadLogs();
+    setInterval(loadLogs, 5000); // Atualizar a cada 5 segundos
+});
+</script>
+{% endblock %}

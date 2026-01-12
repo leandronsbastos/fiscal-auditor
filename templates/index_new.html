@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Resultados - Business Intelligence Fiscal</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --border: #e1e4e8;
+            --text-primary: #24292e;
+            --text-secondary: #586069;
+            --text-muted: #6a737d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 16px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .navbar-info {
+            font-size: 13px;
+            opacity: 0.95;
+        }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+        
+        .header-section {
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        
+        .card-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            transition: border-color 0.2s;
+        }
+        
+        input[type="date"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        small {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #2980b9;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .alert {
+            padding: 16px 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid;
+        }
+        
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .result {
+            padding: 24px;
+            border-radius: 6px;
+            border: 1px solid;
+        }
+        
+        .result-success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        
+        .result-error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+        
+        .result p {
+            margin-bottom: 8px;
+        }
+        
+        .result ul {
+            margin-top: 12px;
+            padding-left: 20px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+        
+        .feature-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: #d1d5da;
+        }
+        
+        .feature-card h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .feature-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .info-box {
+            background: #f6f8fa;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box strong {
+            color: var(--text-primary);
+        }
+        
+        #datalake-info {
+            font-size: 13px;
+            padding: 12px;
+            background: #f6f8fa;
+            border-radius: 4px;
+            margin-top: 8px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <span>📊</span>
+            <span>Business Intelligence Fiscal</span>
+        </div>
+        <div class="navbar-actions">
+            <span class="navbar-info" id="empresaInfo">Carregando empresa...</span>
+            <a href="/painel" class="btn-back">← Voltar ao Painel</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header-section">
+            <h1 class="page-title">Dashboard de Resultados</h1>
+            <p class="page-subtitle">Sistema de Auditoria e Apuração Tributária</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-error">
+            <strong>⚠️ Erro:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <div class="card">
+            <h2 class="card-title">Consulta de Documentos Fiscais</h2>
+            <p class="card-description">Consulte e processe documentos fiscais já importados no datalake</p>
+            
+            <form id="uploadForm">
+                <div class="form-group">
+                    <div id="datalake-info"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo_data">Filtrar por Data de:</label>
+                    <select id="tipo_data" name="tipo_data" required>
+                        <option value="emissao">Emissão</option>
+                        <option value="autorizacao">Autorização</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="data_inicio">Data Início:</label>
+                    <input type="date" id="data_inicio" name="data_inicio" required>
+                    <small>Documentos a partir desta data</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="data_fim">Data Fim:</label>
+                    <input type="date" id="data_fim" name="data_fim" required>
+                    <small>Documentos até esta data</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    Consultar e Processar
+                </button>
+            </form>
+
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p style="color: var(--text-secondary);">Processando documentos...</p>
+            </div>
+
+            <div id="result" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <h3>📁 Classificação</h3>
+                <p>Identificação automática de entradas e saídas</p>
+            </div>
+            <div class="feature-card">
+                <h3>✅ Validação</h3>
+                <p>Verificação de conformidade tributária</p>
+            </div>
+            <div class="feature-card">
+                <h3>🧮 Apuração</h3>
+                <p>Cálculo de ICMS, IPI, PIS, COFINS, IBS e CBS</p>
+            </div>
+            <div class="feature-card">
+                <h3>📊 Relatórios</h3>
+                <p>Geração de demonstrativos e mapas</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obter empresa_id da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const empresaId = urlParams.get('empresa_id');
+        const token = localStorage.getItem('token');
+
+        // Verificar autenticação
+        if (!token || !empresaId) {
+            window.location.href = '/painel';
+        }
+
+        // Carregar informações da empresa
+        async function carregarEmpresa() {
+            try {
+                const response = await fetch(`/api/empresas/${empresaId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const empresa = await response.json();
+                    document.getElementById('empresaInfo').textContent = 
+                        `Empresa: ${empresa.razao_social}`;
+                    
+                    // Definir período padrão (mês atual)
+                    const hoje = new Date();
+                    const primeiroDia = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                    const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+                    
+                    document.getElementById('data_inicio').value = primeiroDia.toISOString().split('T')[0];
+                    document.getElementById('data_fim').value = ultimoDia.toISOString().split('T')[0];
+                } else if (response.status === 401) {
+                    localStorage.removeItem('token');
+                    window.location.href = '/login';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar empresa:', error);
+            }
+        }
+
+        carregarEmpresa();
+
+        // Verificar documentos disponíveis no datalake
+        async function verificarDatalake() {
+            const datalakeInfo = document.getElementById('datalake-info');
+            const dataInicio = document.getElementById('data_inicio').value;
+            const dataFim = document.getElementById('data_fim').value;
+            
+            if (!dataInicio || !dataFim) {
+                datalakeInfo.innerHTML = '<em>Selecione o período para verificar documentos disponíveis</em>';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/verificar-datalake', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        empresa_id: parseInt(empresaId),
+                        data_inicio: dataInicio,
+                        data_fim: dataFim
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.disponivel) {
+                    datalakeInfo.innerHTML = `
+                        <strong style="color: var(--success);">✓ ${data.total} documentos disponíveis no datalake</strong> 
+                        (${data.entradas} entradas, ${data.saidas} saídas)
+                    `;
+                    datalakeInfo.style.display = 'block';
+                } else {
+                    datalakeInfo.innerHTML = '<em style="color: var(--danger);">⚠ Nenhum documento encontrado no datalake para este período</em>';
+                    datalakeInfo.style.display = 'block';
+                }
+            } catch (error) {
+                datalakeInfo.innerHTML = '<em style="color: var(--danger);">Erro ao verificar datalake</em>';
+            }
+        }
+
+        // Monitorar mudanças nas datas para atualizar verificação do datalake
+        document.getElementById('data_inicio').addEventListener('change', verificarDatalake);
+        document.getElementById('data_fim').addEventListener('change', verificarDatalake);
+
+        // Verificar datalake ao carregar
+        setTimeout(verificarDatalake, 500);
+
+        // Processar formulário
+        const form = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+        const result = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Mostrar loading
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            submitBtn.disabled = true;
+            
+            try {
+                // Processar do datalake
+                const dataInicio = document.getElementById('data_inicio').value;
+                const dataFim = document.getElementById('data_fim').value;
+                const tipoData = document.getElementById('tipo_data').value;
+                
+                const response = await fetch('/processar-datalake', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        empresa_id: parseInt(empresaId),
+                        data_inicio: dataInicio,
+                        data_fim: dataFim,
+                        tipo_data: tipoData
+                    })
+                });
+                
+                const data = await response.json();
+                
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                submitBtn.disabled = false;
+                
+                if (data.success) {
+                    result.className = 'result result-success';
+                    result.innerHTML = `
+                        <h3>✅ Sucesso!</h3>
+                        <p>${data.message}</p>
+                        ${data.erros ? `<p><strong>Avisos:</strong> ${data.erros.join(', ')}</p>` : ''}
+                        <div style="margin-top: 16px;">
+                            <a href="/relatorios-fase1?empresa_id=${empresaId}" class="btn btn-success">📊 Ver Análises no BI</a>
+                        </div>
+                    `;
+                } else {
+                    result.className = 'result result-error';
+                    result.innerHTML = `
+                        <h3>❌ Erro</h3>
+                        <p>${data.message}</p>
+                        ${data.erros ? `<ul>${data.erros.map(e => `<li>${e}</li>`).join('')}</ul>` : ''}
+                    `;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                result.style.display = 'block';
+                submitBtn.disabled = false;
+                
+                result.className = 'result result-error';
+                result.innerHTML = `
+                    <h3>❌ Erro</h3>
+                    <p>Erro ao processar: ${error.message}</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

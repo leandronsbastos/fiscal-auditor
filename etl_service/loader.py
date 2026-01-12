@@ -17,6 +17,7 @@ import logging
 from .models import NFe, LogProcessamento, ProcessamentoETL, ArquivoProcessado
 from .database import SessionLocal
 from .config import config
+from .empresa_service import EmpresaService
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,7 @@ class DataLoader:
             db_session: Sessão do banco de dados (opcional)
         """
         self.db_session = db_session
+        self.empresa_service = None
     
     def arquivo_ja_processado(self, caminho_arquivo: str) -> bool:
         """
@@ -94,8 +96,9 @@ class DataLoader:
                 sha256.update(bloco)
         return sha256.hexdigest()
 
-    def carregar_nfe(self, nfe: NFe, arquivo: str, 
-                     processamento_id: Optional[int] = None) -> dict:
+    def carregar_nfe(self, nfe: NFe, arquivo: str,
+                     processamento_id: Optional[int] = None,
+                     dados_emitente: Optional[dict] = None) -> dict:
         """
         Carrega uma NF-e no banco de dados.
         
@@ -103,6 +106,7 @@ class DataLoader:
             nfe: Objeto NFe a ser persistido
             arquivo: Caminho do arquivo original
             processamento_id: ID do processamento ETL
+            dados_emitente: Dados completos do emitente para cadastro
             
         Returns:
             Dicionário com resultado da operação
@@ -115,6 +119,22 @@ class DataLoader:
             'mensagem': '',
             'chave_acesso': nfe.chave_acesso,
         }
+        
+        # Validar e cadastrar empresa se necessário
+        try:
+            if dados_emitente and nfe.emitente_cnpj:
+                if not self.empresa_service:
+                    self.empresa_service = EmpresaService(session)
+                
+                empresa_id = self.empresa_service.validar_ou_cadastrar_empresa(
+                    cnpj=nfe.emitente_cnpj,
+                    dados_emitente=dados_emitente
+                )
+                
+                if empresa_id:
+                    logger.debug(f"Empresa validada/cadastrada. ID: {empresa_id}")
+        except Exception as e:
+            logger.warning(f"Erro ao validar/cadastrar empresa: {str(e)}")
         
         try:
             # Verificar se arquivo já foi processado

@@ -1,0 +1,3115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Intelligence Fiscal - Análise Completa</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --info: #17a2b8;
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --border: #e1e4e8;
+            --text-primary: #24292e;
+            --text-secondary: #586069;
+            --text-muted: #6a737d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 16px 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .navbar-brand {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .navbar-info {
+            font-size: 13px;
+            opacity: 0.95;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+        
+        .page-header {
+            margin-bottom: 32px;
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .page-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+        
+        /* Vision Cards Navigation */
+        .vision-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .vision-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .vision-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+        
+        .vision-card.active {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.05) 0%, rgba(52, 152, 219, 0.02) 100%);
+        }
+        
+        .vision-icon {
+            font-size: 36px;
+            margin-bottom: 16px;
+        }
+        
+        .vision-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .vision-description {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Content Sections */
+        .vision-content {
+            display: none;
+        }
+        
+        .vision-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            margin: 40px 0 24px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .section-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        
+        .kpi-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px 24px;
+            transition: all 0.2s;
+        }
+        
+        .kpi-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 12px;
+        }
+        
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 8px;
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .kpi-trend {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+        
+        /* Charts */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .chart-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 24px;
+        }
+        
+        .chart-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        /* Tables */
+        .table-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .table-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: var(--bg-primary);
+        }
+        
+        th {
+            padding: 12px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        td {
+            padding: 14px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tbody tr:hover {
+            background-color: #fafbfc;
+        }
+        
+        .numeric {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            font-weight: 500;
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .btn-back {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-back:hover {
+            background: #2980b9;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">🎯 Business Intelligence Fiscal</div>
+        <div class="navbar-info" id="empresaInfo">Carregando...</div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Central de Inteligência Fiscal</h1>
+            <p class="page-subtitle">Análise completa e integrada de documentos fiscais eletrônicos</p>
+            <div style="margin-top: 16px;">
+                <a href="/" class="btn-back">← Voltar</a>
+            </div>
+        </div>
+
+        <!-- Vision Selection -->
+        <div class="vision-grid">
+            <div class="vision-card active" data-vision="conformidade">
+                <div class="vision-icon">✅</div>
+                <div class="vision-title">1. Conformidade Fiscal</div>
+                <div class="vision-description">Monitoramento de erros, inconsistências e validações dos XMLs</div>
+            </div>
+            
+            <div class="vision-card" data-vision="exposicao">
+                <div class="vision-icon">💰</div>
+                <div class="vision-title">2. Exposição Tributária</div>
+                <div class="vision-description">Impacto financeiro de impostos, créditos e alíquotas efetivas</div>
+            </div>
+            
+            <div class="vision-card" data-vision="parceiros">
+                <div class="vision-icon">🤝</div>
+                <div class="vision-title">3. Operações por Parceiro</div>
+                <div class="vision-description">Volume e características de transações com clientes e fornecedores</div>
+            </div>
+            
+            <div class="vision-card" data-vision="temporalidade">
+                <div class="vision-icon">📅</div>
+                <div class="vision-title">4. Temporalidade</div>
+                <div class="vision-description">Padrões temporais, sazonalidade e tendências</div>
+            </div>
+            
+            <div class="vision-card" data-vision="eficiencia">
+                <div class="vision-icon">⚡</div>
+                <div class="vision-title">5. Eficiência Operacional</div>
+                <div class="vision-description">Otimização de processos e tempos de ciclo fiscal</div>
+            </div>
+            
+            <div class="vision-card" data-vision="risco">
+                <div class="vision-icon">⚠️</div>
+                <div class="vision-title">6. Risco e Auditoria</div>
+                <div class="vision-description">Identificação de riscos e preparação para auditorias</div>
+            </div>
+            
+            <div class="vision-card" data-vision="produto">
+                <div class="vision-icon">📦</div>
+                <div class="vision-title">7. Análise por Produto</div>
+                <div class="vision-description">Tributação e movimentação por NCM e CFOP</div>
+            </div>
+            
+            <div class="vision-card" data-vision="integracao">
+                <div class="vision-icon">🔄</div>
+                <div class="vision-title">8. Performance de Integrações</div>
+                <div class="vision-description">Qualidade das trocas de dados entre sistemas</div>
+            </div>
+            
+            <div class="vision-card" data-vision="benchmarking">
+                <div class="vision-icon">📊</div>
+                <div class="vision-title">9. Benchmarking Interno</div>
+                <div class="vision-description">Comparação de performance entre filiais e regiões</div>
+            </div>
+            
+            <div class="vision-card" data-vision="preditiva">
+                <div class="vision-icon">🔮</div>
+                <div class="vision-title">10. Análise Preditiva</div>
+                <div class="vision-description">Previsões e recomendações de otimização tributária</div>
+            </div>
+            
+            <div class="vision-card" data-vision="reforma">
+                <div class="vision-icon">🆕</div>
+                <div class="vision-title">11. Reforma Tributária</div>
+                <div class="vision-description">IBS e CBS - Impacto da nova tributação sobre consumo</div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="color: var(--text-secondary);">Carregando análises...</p>
+        </div>
+
+        <!-- Vision Contents -->
+        <div id="vision-contents"></div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const empresaId = urlParams.get('empresa_id');
+        const token = localStorage.getItem('token');
+        let currentVision = 'conformidade';
+        let charts = {};
+
+        // Carregar informações da empresa
+        async function carregarEmpresa() {
+            try {
+                const response = await fetch(`/api/empresas/${empresaId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (response.ok) {
+                    const empresa = await response.json();
+                    document.getElementById('empresaInfo').textContent = `Empresa: ${empresa.razao_social}`;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar empresa:', error);
+            }
+        }
+
+        // Navegação entre visões
+        document.querySelectorAll('.vision-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.vision-card').forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+                
+                const vision = card.dataset.vision;
+                currentVision = vision;
+                carregarVisao(vision);
+            });
+        });
+
+        // Carregar dados de uma visão
+        async function carregarVisao(vision) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('vision-contents').innerHTML = '';
+            
+            try {
+                const response = await fetch(`/api/bi-fiscal/${vision}?empresa_id=${empresaId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderizarVisao(vision, data);
+                } else {
+                    document.getElementById('vision-contents').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-muted);">
+                            <p>Erro ao carregar dados da visão</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                document.getElementById('vision-contents').innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--danger);">
+                        <p>Erro ao carregar análise: ${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // Renderizar conteúdo da visão
+        function renderizarVisao(vision, data) {
+            const container = document.getElementById('vision-contents');
+            container.innerHTML = '';
+            
+            // Criar div para o conteúdo
+            const content = document.createElement('div');
+            content.className = 'vision-content active';
+            
+            // Renderizar baseado no tipo de visão
+            if (vision === 'conformidade') {
+                content.innerHTML = renderConformidade(data);
+            } else if (vision === 'exposicao') {
+                content.innerHTML = renderExposicao(data);
+            } else if (vision === 'parceiros') {
+                content.innerHTML = renderParceiros(data);
+            } else if (vision === 'temporalidade') {
+                content.innerHTML = renderTemporalidade(data);
+            } else if (vision === 'reforma') {
+                content.innerHTML = renderReforma(data);
+            } else if (vision === 'risco') {
+                content.innerHTML = renderRisco(data);
+            } else if (vision === 'produto') {
+                content.innerHTML = renderProduto(data);
+            } else if (vision === 'eficiencia') {
+                content.innerHTML = renderEficiencia(data);
+            } else if (vision === 'benchmarking') {
+                content.innerHTML = renderBenchmarking(data);
+            } else {
+                content.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">Em Desenvolvimento</h2>
+                        <p class="section-description">Esta visão está sendo implementada</p>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(content);
+            
+            // Inicializar gráficos depois que o HTML for inserido
+            setTimeout(() => inicializarGraficos(vision, data), 100);
+        }
+
+        function renderConformidade(data) {
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">Visão de Conformidade Fiscal</h2>
+                    <p class="section-description">Monitoramento de validações, erros e inconsistências nos documentos fiscais</p>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total de Documentos</div>
+                        <div class="kpi-value">${data.total_documentos || 0}</div>
+                        <div class="kpi-trend">XMLs processados</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Taxa de Conformidade</div>
+                        <div class="kpi-value">${data.taxa_conformidade || 0}%</div>
+                        <div class="kpi-trend ${data.taxa_conformidade >= 95 ? 'trend-up' : 'trend-down'}">
+                            ${data.taxa_conformidade >= 95 ? '↑ Excelente' : '↓ Atenção necessária'}
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Documentos com Erros</div>
+                        <div class="kpi-value">${data.documentos_erro || 0}</div>
+                        <div class="kpi-trend">${((data.documentos_erro / data.total_documentos) * 100).toFixed(1)}% do total</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Cancelamentos</div>
+                        <div class="kpi-value">${data.cancelamentos || 0}</div>
+                        <div class="kpi-trend">Documentos cancelados</div>
+                    </div>
+                </div>
+                
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Status de Documentos</h3>
+                        <canvas id="chartConformidadeStatus"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Tipos de Inconsistências</h3>
+                        <canvas id="chartConformidadeErros"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderExposicao(data) {
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">Visão de Exposição Tributária</h2>
+                    <p class="section-description">Análise do impacto financeiro dos tributos por operação</p>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total em Impostos</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.total_impostos || 0)}</div>
+                        <div class="kpi-trend">Todos os tributos</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">ICMS Total</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.icms_total || 0)}</div>
+                        <div class="kpi-trend">${((data.icms_total / data.total_impostos) * 100).toFixed(1)}% do total</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Créditos Acumulados</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.creditos_acumulados || 0)}</div>
+                        <div class="kpi-trend trend-up">Disponíveis</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Carga Tributária Efetiva</div>
+                        <div class="kpi-value">${data.carga_efetiva || 0}%</div>
+                        <div class="kpi-trend">Sobre faturamento</div>
+                    </div>
+                </div>
+                
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição por Imposto</h3>
+                        <canvas id="chartExposicaoImpostos"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Evolução Mensal</h3>
+                        <canvas id="chartExposicaoEvolucao"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderParceiros(data) {
+            let tabelaHTML = '';
+            if (data.top_parceiros && data.top_parceiros.length > 0) {
+                tabelaHTML = `
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3 class="table-title">Top 10 Parceiros Comerciais</h3>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Posição</th>
+                                    <th>Razão Social</th>
+                                    <th class="numeric">Total de Operações</th>
+                                    <th class="numeric">Valor Total</th>
+                                    <th class="numeric">Participação</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.top_parceiros.map((p, i) => `
+                                    <tr>
+                                        <td><strong>${i + 1}º</strong></td>
+                                        <td>${p.razao_social}</td>
+                                        <td class="numeric">${p.total_operacoes}</td>
+                                        <td class="numeric">R$ ${formatarValor(p.valor_total)}</td>
+                                        <td class="numeric">${p.participacao.toFixed(2)}%</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">Visão de Operações por Parceiro</h2>
+                    <p class="section-description">Análise de volume e concentração por clientes e fornecedores</p>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Total de Parceiros</div>
+                        <div class="kpi-value">${data.total_parceiros || 0}</div>
+                        <div class="kpi-trend">Únicos no período</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Concentração Top 5</div>
+                        <div class="kpi-value">${data.concentracao_top5 || 0}%</div>
+                        <div class="kpi-trend">Do faturamento total</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Ticket Médio</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.ticket_medio || 0)}</div>
+                        <div class="kpi-trend">Por operação</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Novos Parceiros</div>
+                        <div class="kpi-value">${data.novos_parceiros || 0}</div>
+                        <div class="kpi-trend">No último mês</div>
+                    </div>
+                </div>
+                
+                ${tabelaHTML}
+                
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Concentração de Faturamento</h3>
+                        <canvas id="chartParceirosConcentracao"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição por Região</h3>
+                        <canvas id="chartParceirosRegiao"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTemporalidade(data) {
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">Visão de Temporalidade e Sazonalidade</h2>
+                    <p class="section-description">Padrões temporais e tendências de emissão de documentos</p>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">Média Diária</div>
+                        <div class="kpi-value">${data.media_diaria || 0}</div>
+                        <div class="kpi-trend">Documentos/dia</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Pico de Emissão</div>
+                        <div class="kpi-value">${data.pico_emissao || 0}</div>
+                        <div class="kpi-trend">Em ${data.data_pico || 'N/A'}</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Tendência Mensal</div>
+                        <div class="kpi-value trend-up">↑ ${data.tendencia || 0}%</div>
+                        <div class="kpi-trend">Crescimento vs mês anterior</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-label">Horário de Pico</div>
+                        <div class="kpi-value">${data.horario_pico || '14h-16h'}</div>
+                        <div class="kpi-trend">Maior volume</div>
+                    </div>
+                </div>
+                
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Volume por Dia da Semana</h3>
+                        <canvas id="chartTemporalidadeSemana"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Tendência Mensal</h3>
+                        <canvas id="chartTemporalidadeMensal"></canvas>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderRisco(data) {
+            // Determinar classe de risco
+            const riscoClass = data.score_risco < 5 ? 'positive' : (data.score_risco < 15 ? 'warning' : 'negative');
+            const riscoIcon = data.score_risco < 5 ? '✅' : (data.score_risco < 15 ? '⚠️' : '🚨');
+            
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">⚠️ Visão de Risco Fiscal e Auditoria</h2>
+                    <p class="section-description">Identificação de riscos e preparação para auditorias fiscais</p>
+                </div>
+                
+                <!-- Painel de Status de Risco -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 32px; margin-bottom: 32px; color: white; box-shadow: 0 8px 24px rgba(118, 75, 162, 0.3);">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Status Geral de Risco</div>
+                            <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">${riscoIcon} ${data.status_risco || 'Médio'}</div>
+                            <div style="font-size: 16px; opacity: 0.9;">Score de Risco: ${formatarValor(data.score_risco || 0)}%</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 64px; font-weight: 900; opacity: 0.2;">${data.score_risco || 0}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">SCORE DE RISCO</div>
+                        <div class="kpi-value ${riscoClass}">${formatarValor(data.score_risco || 0)}</div>
+                        <div class="kpi-trend ${riscoClass}">De 0 a 100 (menor é melhor)</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">DIVERGÊNCIAS DETECTADAS</div>
+                        <div class="kpi-value negative">${data.divergencias_detectadas || 0}</div>
+                        <div class="kpi-trend negative">Documentos com problemas</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">DOCUMENTOS SUSPEITOS</div>
+                        <div class="kpi-value negative">${data.documentos_suspeitos || 0}</div>
+                        <div class="kpi-trend">Requerem atenção</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">ALERTAS CRÍTICOS</div>
+                        <div class="kpi-value negative">${data.alertas_criticos || 0}</div>
+                        <div class="kpi-trend negative">Ação imediata necessária</div>
+                    </div>
+                </div>
+                
+                <!-- Indicadores de Risco por Categoria -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">📊 Análise de Risco por Categoria</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <div style="background: var(--bg-secondary); border-left: 4px solid #3498db; padding: 20px; border-radius: 6px;">
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 8px;">RISCO TRIBUTÁRIO</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${data.score_risco < 5 ? 'Baixo' : (data.score_risco < 15 ? 'Médio' : 'Alto')}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Conformidade com legislação</div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-left: 4px solid #2ecc71; padding: 20px; border-radius: 6px;">
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 8px;">RISCO DE AUDITORIA</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Médio</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Probabilidade de fiscalização</div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-left: 4px solid #f39c12; padding: 20px; border-radius: 6px;">
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 8px;">RISCO OPERACIONAL</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Baixo</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Processos e controles internos</div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-left: 4px solid #e74c3c; padding: 20px; border-radius: 6px;">
+                        <div style="font-size: 12px; color: var(--text-secondary); font-weight: 600; margin-bottom: 8px;">RISCO DE PENALIDADE</div>
+                        <div style="font-size: 28px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">${data.alertas_criticos > 10 ? 'Alto' : 'Baixo'}</div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">Exposição a multas</div>
+                    </div>
+                </div>
+                
+                <!-- Gráficos de Análise -->
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição de Riscos</h3>
+                        <canvas id="chartRiscoDistribuicao"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Evolução do Score de Risco</h3>
+                        <canvas id="chartRiscoEvolucao"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Checklist de Auditoria -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">✅ Checklist de Preparação para Auditoria</h3>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-radius: 8px; padding: 24px; margin-bottom: 32px;">
+                    <div style="display: grid; gap: 16px;">
+                        <div style="display: flex; align-items: center; padding: 12px; background: var(--bg-primary); border-radius: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #27ae60; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 16px;">✓</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Documentos Fiscais Organizados</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">Todos os XMLs armazenados e processados</div>
+                            </div>
+                            <div style="color: #27ae60; font-weight: 700;">OK</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; padding: 12px; background: var(--bg-primary); border-radius: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${data.divergencias_detectadas === 0 ? '#27ae60' : '#f39c12'}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 16px;">${data.divergencias_detectadas === 0 ? '✓' : '!'}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Validação de Conformidade</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">${data.divergencias_detectadas || 0} divergências encontradas</div>
+                            </div>
+                            <div style="color: ${data.divergencias_detectadas === 0 ? '#27ae60' : '#f39c12'}; font-weight: 700;">${data.divergencias_detectadas === 0 ? 'OK' : 'Atenção'}</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; padding: 12px; background: var(--bg-primary); border-radius: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #3498db; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 16px;">i</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Livros Fiscais Atualizados</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">SPED Fiscal em dia</div>
+                            </div>
+                            <div style="color: #3498db; font-weight: 700;">Verificar</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; padding: 12px; background: var(--bg-primary); border-radius: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: #27ae60; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 16px;">✓</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Apuração de Impostos</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">Cálculos conferidos e validados</div>
+                            </div>
+                            <div style="color: #27ae60; font-weight: 700;">OK</div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; padding: 12px; background: var(--bg-primary); border-radius: 6px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${data.alertas_criticos === 0 ? '#27ae60' : '#e74c3c'}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; margin-right: 16px;">${data.alertas_criticos === 0 ? '✓' : '✗'}</div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 4px;">Alertas Críticos Resolvidos</div>
+                                <div style="font-size: 13px; color: var(--text-secondary);">${data.alertas_criticos || 0} alertas pendentes</div>
+                            </div>
+                            <div style="color: ${data.alertas_criticos === 0 ? '#27ae60' : '#e74c3c'}; font-weight: 700;">${data.alertas_criticos === 0 ? 'OK' : 'Crítico'}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recomendações -->
+                <div class="section-header">
+                    <h3 class="section-title">💡 Recomendações de Mitigação de Riscos</h3>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent); padding: 24px; border-radius: 6px;">
+                    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary); line-height: 1.8;">
+                        ${data.divergencias_detectadas > 0 ? `<li style="margin-bottom: 12px;"><strong>Prioridade Alta:</strong> Regularizar ${data.divergencias_detectadas} documentos com divergências antes da próxima auditoria</li>` : ''}
+                        ${data.alertas_criticos > 0 ? `<li style="margin-bottom: 12px;"><strong>Crítico:</strong> Resolver ${data.alertas_criticos} alertas críticos imediatamente para evitar penalidades</li>` : ''}
+                        <li style="margin-bottom: 12px;">Realizar revisão mensal de todos os documentos fiscais processados</li>
+                        <li style="margin-bottom: 12px;">Implementar controles automatizados de validação de XMLs na entrada</li>
+                        <li style="margin-bottom: 12px;">Manter backup seguro de todos os documentos fiscais por no mínimo 5 anos</li>
+                        <li style="margin-bottom: 12px;">Treinar equipe fiscal sobre mudanças na legislação tributária</li>
+                        <li style="margin-bottom: 12px;">Criar relatórios mensais de conformidade para gestão</li>
+                        ${data.score_risco > 15 ? `<li style="margin-bottom: 12px;"><strong>Atenção:</strong> Score de risco acima de 15% - considere auditoria interna imediata</li>` : ''}
+                    </ul>
+                </div>
+                
+                <!-- Próximas Ações -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">🎯 Próximas Ações Recomendadas</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 8px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📋</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Auditoria Interna</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Realizar revisão completa dos últimos 3 meses</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 24px; border-radius: 8px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🔧</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Correções</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Regularizar divergências identificadas</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 24px; border-radius: 8px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📚</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Treinamento</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Capacitar equipe em conformidade fiscal</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProduto(data) {
+            const totalizadores = data.totalizadores || {};
+            const divergencias = data.divergencias || [];
+            const analise_ncm = data.analise_ncm || [];
+            const analise_cfop = data.analise_cfop || [];
+            const cfop_resumo = data.cfop_resumo || {};
+            
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">📦 Análise por Produto NCM x CFOP</h2>
+                    <p class="section-description">Tributação detalhada e movimentação fiscal por classificação</p>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">PRODUTOS ÚNICOS</div>
+                        <div class="kpi-value">${totalizadores.produtos_unicos || 0}</div>
+                        <div class="kpi-trend positive">Cadastrados</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">NCM DISTINTOS</div>
+                        <div class="kpi-value">${totalizadores.ncm_distintos || 0}</div>
+                        <div class="kpi-trend">Classificações fiscais</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">CFOP DISTINTOS</div>
+                        <div class="kpi-value">${totalizadores.cfop_distintos || 0}</div>
+                        <div class="kpi-trend">Tipos de operação</div>
+                    </div>
+                    
+                    <div class="kpi-card ${divergencias.length > 0 ? 'negative' : 'positive'}">
+                        <div class="kpi-label">DIVERGÊNCIAS</div>
+                        <div class="kpi-value">${totalizadores.divergencias_detectadas || 0}</div>
+                        <div class="kpi-trend ${divergencias.length > 0 ? 'negative' : 'positive'}">${divergencias.length > 0 ? 'Requer atenção' : 'Conformidade OK'}</div>
+                    </div>
+                </div>
+                
+                <!-- KPIs de CST -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">CST ICMS</div>
+                        <div style="font-size: 32px; font-weight: 700;">${(totalizadores.cst_icms_entrada_distintos || 0) + (totalizadores.cst_icms_saida_distintos || 0)}</div>
+                        <div style="font-size: 12px; opacity: 0.8;">${totalizadores.cst_icms_entrada_distintos || 0} entradas | ${totalizadores.cst_icms_saida_distintos || 0} saídas</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">CST PIS</div>
+                        <div style="font-size: 32px; font-weight: 700;">${(totalizadores.cst_pis_entrada_distintos || 0) + (totalizadores.cst_pis_saida_distintos || 0)}</div>
+                        <div style="font-size: 12px; opacity: 0.8;">${totalizadores.cst_pis_entrada_distintos || 0} entradas | ${totalizadores.cst_pis_saida_distintos || 0} saídas</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">CST COFINS</div>
+                        <div style="font-size: 32px; font-weight: 700;">${(totalizadores.cst_cofins_entrada_distintos || 0) + (totalizadores.cst_cofins_saida_distintos || 0)}</div>
+                        <div style="font-size: 12px; opacity: 0.8;">${totalizadores.cst_cofins_entrada_distintos || 0} entradas | ${totalizadores.cst_cofins_saida_distintos || 0} saídas</div>
+                    </div>
+                </div>
+                
+                <!-- DIVERGÊNCIAS FISCAIS -->
+                ${divergencias.length > 0 ? `
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">⚠️ Divergências Tributárias Detectadas</h3>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%); color: white; padding: 24px; border-radius: 8px; margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; gap: 16px;">
+                        <div style="font-size: 48px;">🚨</div>
+                        <div>
+                            <div style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">${divergencias.length} Divergências</div>
+                            <div style="font-size: 16px; opacity: 0.95;">Mesma NCM com alíquotas diferentes - revisar enquadramento tributário</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <table class="data-table" style="margin-bottom: 32px;">
+                    <thead>
+                        <tr>
+                            <th>NCM</th>
+                            <th>Tipo</th>
+                            <th style="text-align: right;">Alíq. Mínima</th>
+                            <th style="text-align: right;">Alíq. Máxima</th>
+                            <th style="text-align: right;">Variação</th>
+                            <th>CFOPs</th>
+                            <th style="text-align: right;">Lançamentos</th>
+                            <th style="text-align: center;">Risco</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${divergencias.slice(0, 10).map(div => `
+                        <tr style="background: ${div.variacao > 10 ? 'rgba(231, 76, 60, 0.05)' : 'rgba(241, 196, 15, 0.05)'};">
+                            <td><strong>${div.ncm}</strong></td>
+                            <td>${div.tipo}</td>
+                            <td style="text-align: right;">${formatarValor(div.aliq_min)}%</td>
+                            <td style="text-align: right;">${formatarValor(div.aliq_max)}%</td>
+                            <td style="text-align: right;"><strong style="color: #e74c3c;">${formatarValor(div.variacao)}%</strong></td>
+                            <td>${div.cfops.join(', ')}</td>
+                            <td style="text-align: right;">${div.lancamentos_total}</td>
+                            <td style="text-align: center;">
+                                <span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; background: ${div.variacao > 10 ? '#e74c3c' : '#f39c12'}; color: white;">
+                                    ${div.variacao > 10 ? 'ALTO' : 'MÉDIO'}
+                                </span>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                ` : ''}
+                
+                <!-- ANÁLISE POR NCM -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">📋 Análise Detalhada por NCM</h3>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>NCM</th>
+                            <th style="text-align: right;">Produtos</th>
+                            <th style="text-align: right;">Lançamentos</th>
+                            <th style="text-align: right;">Quantidade</th>
+                            <th style="text-align: right;">Valor Contábil</th>
+                            <th style="text-align: right;">BC ICMS</th>
+                            <th style="text-align: right;">Alíq. ICMS</th>
+                            <th style="text-align: right;">Total ICMS</th>
+                            <th style="text-align: right;">IPI</th>
+                            <th style="text-align: right;">PIS</th>
+                            <th style="text-align: right;">COFINS</th>
+                            <th style="text-align: right;">IBS</th>
+                            <th style="text-align: right;">CBS</th>
+                            <th style="text-align: center;">Carga</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${analise_ncm.slice(0, 15).map((ncm, idx) => `
+                        <tr>
+                            <td><strong>${ncm.ncm}</strong></td>
+                            <td style="text-align: right;">${ncm.produtos_distintos}</td>
+                            <td style="text-align: right;">${ncm.lancamentos}</td>
+                            <td style="text-align: right;">${formatarValor(ncm.quantidade)}</td>
+                            <td style="text-align: right;"><strong>R$ ${formatarValor(ncm.valor_contabil)}</strong></td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.bc_icms)}</td>
+                            <td style="text-align: right;">${formatarValor(ncm.aliq_icms)}%</td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.valor_icms)}</td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.valor_ipi)}</td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.valor_pis)}</td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.valor_cofins)}</td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.valor_ibs)}</td>
+                            <td style="text-align: right;">R$ ${formatarValor(ncm.valor_cbs)}</td>
+                            <td style="text-align: center;">
+                                <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                    <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                        <div style="width: ${Math.min(ncm.carga_tributaria, 100)}%; background: ${ncm.carga_tributaria > 40 ? '#e74c3c' : ncm.carga_tributaria > 25 ? '#f39c12' : '#27ae60'}; height: 100%;"></div>
+                                    </div>
+                                    <strong style="min-width: 50px; color: ${ncm.carga_tributaria > 40 ? '#e74c3c' : ncm.carga_tributaria > 25 ? '#f39c12' : '#27ae60'};">${formatarValor(ncm.carga_tributaria)}%</strong>
+                                </div>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <!-- HEATMAP DE CARGA TRIBUTÁRIA POR NCM -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">🔥 Heatmap de Carga Tributária</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 32px;">
+                    ${analise_ncm.slice(0, 12).map(ncm => {
+                        const carga = ncm.carga_tributaria;
+                        const cor = carga > 40 ? '#e74c3c' : carga > 30 ? '#f39c12' : carga > 20 ? '#f1c40f' : '#27ae60';
+                        const intensidade = Math.min(carga / 50, 1);
+                        
+                        return `
+                        <div style="background: ${cor}; opacity: ${0.3 + intensidade * 0.7}; padding: 20px; border-radius: 8px; text-align: center; color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <div style="font-size: 12px; font-weight: 600; margin-bottom: 8px; opacity: 0.9;">NCM</div>
+                            <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">${ncm.ncm}</div>
+                            <div style="font-size: 24px; font-weight: 700;">${formatarValor(carga)}%</div>
+                            <div style="font-size: 11px; margin-top: 4px; opacity: 0.8;">carga</div>
+                        </div>
+                    `}).join('')}
+                </div>
+                
+                <!-- ANÁLISE POR CFOP -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">🔄 Análise por CFOP</h3>
+                </div>
+                
+                <!-- Resumo de Operações -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">ENTRADAS</div>
+                        <div style="font-size: 28px; font-weight: 700;">R$ ${formatarValor(cfop_resumo.total_entrada || 0)}</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">SAÍDAS</div>
+                        <div style="font-size: 28px; font-weight: 700;">R$ ${formatarValor(cfop_resumo.total_saida || 0)}</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">INTERNAS</div>
+                        <div style="font-size: 28px; font-weight: 700;">R$ ${formatarValor(cfop_resumo.operacoes_internas || 0)}</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">INTERESTADUAIS</div>
+                        <div style="font-size: 28px; font-weight: 700;">R$ ${formatarValor(cfop_resumo.operacoes_interestaduais || 0)}</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; padding: 20px; border-radius: 8px;">
+                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">EXPORTAÇÕES</div>
+                        <div style="font-size: 28px; font-weight: 700;">R$ ${formatarValor(cfop_resumo.exportacoes || 0)}</div>
+                    </div>
+                </div>
+                
+                <!-- Tabela CFOP Detalhada -->
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>CFOP</th>
+                            <th>Tipo de Operação</th>
+                            <th style="text-align: right;">Lançamentos</th>
+                            <th style="text-align: right;">Quantidade</th>
+                            <th style="text-align: right;">Valor Total</th>
+                            <th style="text-align: right;">BC ICMS</th>
+                            <th style="text-align: right;">ICMS</th>
+                            <th style="text-align: right;">IPI</th>
+                            <th style="text-align: right;">PIS</th>
+                            <th style="text-align: right;">COFINS</th>
+                            <th style="text-align: right;">IBS/CBS</th>
+                            <th style="text-align: right;">Total Tributos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${analise_cfop.slice(0, 20).map(cfop => {
+                            const entrada = cfop.tipo.includes('Entrada');
+                            const exportacao = cfop.tipo.includes('Exterior');
+                            
+                            return `
+                            <tr>
+                                <td><strong>${cfop.cfop}</strong></td>
+                                <td>
+                                    <span style="display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: ${entrada ? '#3498db' : exportacao ? '#9b59b6' : '#e74c3c'}; color: white;">
+                                        ${cfop.tipo}
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">${cfop.lancamentos}</td>
+                                <td style="text-align: right;">${formatarValor(cfop.quantidade)}</td>
+                                <td style="text-align: right;"><strong>R$ ${formatarValor(cfop.valor_total)}</strong></td>
+                                <td style="text-align: right;">R$ ${formatarValor(cfop.bc_icms)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(cfop.valor_icms)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(cfop.valor_ipi)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(cfop.valor_pis)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(cfop.valor_cofins)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor((cfop.valor_ibs || 0) + (cfop.valor_cbs || 0))}</td>
+                                <td style="text-align: right;"><strong style="color: var(--accent);">R$ ${formatarValor(cfop.total_tributos)}</strong></td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+                
+                <!-- TOP PRODUTOS DETALHADO NCM x CFOP -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">🏆 Top Produtos Detalhados (NCM x CFOP)</h3>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Produto</th>
+                            <th style="text-align: center;">NCM</th>
+                            <th style="text-align: center;">CFOP</th>
+                            <th style="text-align: right;">Lançamentos</th>
+                            <th style="text-align: right;">Quantidade</th>
+                            <th style="text-align: right;">Valor Total</th>
+                            <th style="text-align: right;">Valor Médio</th>
+                            <th style="text-align: right;">ICMS</th>
+                            <th style="text-align: right;">IPI</th>
+                            <th style="text-align: right;">PIS</th>
+                            <th style="text-align: right;">COFINS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(data.top_produtos || []).map((prod, idx) => {
+                            return `
+                            <tr>
+                                <td style="text-align: center; font-weight: 700; color: var(--accent);">${idx + 1}</td>
+                                <td><strong>${prod.produto}</strong></td>
+                                <td style="text-align: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background: #3498db; color: white; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                        ${prod.ncm}
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span style="display: inline-block; padding: 4px 8px; background: #9b59b6; color: white; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                        ${prod.cfop}
+                                    </span>
+                                </td>
+                                <td style="text-align: right;">${prod.lancamentos}</td>
+                                <td style="text-align: right;">${formatarValor(prod.quantidade)}</td>
+                                <td style="text-align: right;"><strong>R$ ${formatarValor(prod.valor_total)}</strong></td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_medio)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_icms)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_ipi)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_pis)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_cofins)}</td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+                
+                <!-- Gráficos de Análise -->
+                <div class="chart-grid" style="margin-top: 32px;">
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 Top NCM por Carga Tributária</h3>
+                        <canvas id="chartNCMCarga"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">🔄 Distribuição por CFOP</h3>
+                        <canvas id="chartCFOPDistribuicao"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-grid" style="margin-top: 20px;">
+                    <div class="chart-container">
+                        <h3 class="chart-title">💰 Tributos por NCM (Top 10)</h3>
+                        <canvas id="chartNCMTributos"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">📦 Valor Movimentado por CFOP</h3>
+                        <canvas id="chartCFOPValor"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Análise e Insights -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">💡 Análise e Insights</h3>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent); padding: 24px; border-radius: 6px; margin-bottom: 32px;">
+                    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary); line-height: 1.8;">
+                        ${analise_ncm.length > 0 ? `
+                            <li style="margin-bottom: 12px;"><strong>NCM Principal:</strong> ${analise_ncm[0].ncm} representa R$ ${formatarValor(analise_ncm[0].valor_contabil)} em movimentação</li>
+                            <li style="margin-bottom: 12px;"><strong>Carga Tributária Máxima:</strong> NCM ${analise_ncm[0].ncm} com ${formatarValor(analise_ncm[0].carga_tributaria)}% de carga tributária</li>
+                        ` : ''}
+                        ${divergencias.length > 0 ? `
+                            <li style="margin-bottom: 12px; color: #e74c3c;"><strong>⚠️ Atenção:</strong> ${divergencias.length} divergências tributárias detectadas - mesma NCM com alíquotas diferentes</li>
+                        ` : `
+                            <li style="margin-bottom: 12px; color: #27ae60;"><strong>✓ Conformidade:</strong> Nenhuma divergência tributária detectada</li>
+                        `}
+                        <li style="margin-bottom: 12px;">Portfolio com ${totalizadores.produtos_unicos || 0} produtos únicos distribuídos em ${totalizadores.ncm_distintos || 0} classificações NCM</li>
+                        <li style="margin-bottom: 12px;">Operações divididas em ${totalizadores.cfop_distintos || 0} tipos de CFOP diferentes</li>
+                        ${cfop_resumo.total_entrada > 0 && cfop_resumo.total_saida > 0 ? `
+                            <li style="margin-bottom: 12px;">Relação Entrada/Saída: R$ ${formatarValor(cfop_resumo.total_entrada)} em entradas vs R$ ${formatarValor(cfop_resumo.total_saida)} em saídas</li>
+                        ` : ''}
+                        ${cfop_resumo.exportacoes > 0 ? `
+                            <li style="margin-bottom: 12px;"><strong>Exportações:</strong> R$ ${formatarValor(cfop_resumo.exportacoes)} em operações de exportação</li>
+                        ` : ''}
+                    </ul>
+                </div>
+                
+                <!-- Recomendações Estratégicas -->
+                <div class="section-header">
+                    <h3 class="section-title">🎯 Recomendações Estratégicas</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    ${divergencias.length > 0 ? `
+                    <div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🚨</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Corrigir Divergências</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Revisar ${divergencias.length} divergências tributárias detectadas</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🔍</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Revisar Classificação NCM</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Validar enquadramento fiscal dos produtos com maior carga tributária</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">💰</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Otimização Tributária</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Analisar benefícios fiscais e incentivos aplicáveis por NCM</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Análise CFOP</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Revisar natureza das operações e adequação dos CFOPs utilizados</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(250, 112, 154, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">⚖️</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Compliance Fiscal</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Garantir conformidade com legislação tributária vigente</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(48, 207, 208, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Planejamento Tributário</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Desenvolver estratégia de redução de carga tributária</div>
+                    </div>
+                </div>
+                
+                <!-- ANÁLISE POR CST -->
+                <div class="section-header" style="margin-top: 48px;">
+                    <h3 class="section-title">📋 Análise por CST (Código de Situação Tributária)</h3>
+                </div>
+                
+                <!-- CST de ICMS - ENTRADA -->
+                <div style="margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-size: 40px;">📥</div>
+                            <div>
+                                <div style="font-size: 22px; font-weight: 700;">CST de ICMS - ENTRADAS</div>
+                                <div style="font-size: 14px; opacity: 0.9;">${(data.analise_cst_icms_entrada || []).length} situações tributárias diferentes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">CST</th>
+                                <th>Descrição</th>
+                                <th style="text-align: right;">Lançamentos</th>
+                                <th style="text-align: right;">Valor Total</th>
+                                <th style="text-align: right;">BC ICMS</th>
+                                <th style="text-align: right;">Valor ICMS</th>
+                                <th style="text-align: right;">Alíq. Média</th>
+                                <th style="text-align: center;">% Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(data.analise_cst_icms_entrada || []).map((cst, idx) => {
+                                const totalValor = (data.analise_cst_icms_entrada || []).reduce((sum, c) => sum + c.valor_total, 0);
+                                const participacao = totalValor > 0 ? (cst.valor_total / totalValor) * 100 : 0;
+                                
+                                // Cores por tipo de CST
+                                let cor = '#3498db';
+                                if (cst.cst.startsWith('0') || cst.cst.startsWith('10') || cst.cst.startsWith('20')) {
+                                    cor = '#27ae60'; // Tributado
+                                } else if (cst.cst.startsWith('40') || cst.cst.startsWith('41')) {
+                                    cor = '#95a5a6'; // Isento/Não tributado
+                                } else if (cst.cst.startsWith('60')) {
+                                    cor = '#f39c12'; // ST
+                                } else if (cst.cst.startsWith('101') || cst.cst.startsWith('102')) {
+                                    cor = '#9b59b6'; // Simples Nacional
+                                }
+                                
+                                return `
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">
+                                            ${cst.cst}
+                                        </span>
+                                    </td>
+                                    <td><strong>${cst.descricao}</strong></td>
+                                    <td style="text-align: right;">${cst.lancamentos}</td>
+                                    <td style="text-align: right;"><strong>R$ ${formatarValor(cst.valor_total)}</strong></td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.bc)}</td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.valor)}</td>
+                                    <td style="text-align: right;">${formatarValor(cst.aliq_media)}%</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: ${participacao}%; background: ${cor}; height: 100%;"></div>
+                                            </div>
+                                            <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(participacao)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- CST de ICMS - SAÍDA -->
+                <div style="margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-size: 40px;">📤</div>
+                            <div>
+                                <div style="font-size: 22px; font-weight: 700;">CST de ICMS - SAÍDAS</div>
+                                <div style="font-size: 14px; opacity: 0.9;">${(data.analise_cst_icms_saida || []).length} situações tributárias diferentes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">CST</th>
+                                <th>Descrição</th>
+                                <th style="text-align: right;">Lançamentos</th>
+                                <th style="text-align: right;">Valor Total</th>
+                                <th style="text-align: right;">BC ICMS</th>
+                                <th style="text-align: right;">Valor ICMS</th>
+                                <th style="text-align: right;">Alíq. Média</th>
+                                <th style="text-align: center;">% Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(data.analise_cst_icms_saida || []).map((cst, idx) => {
+                                const totalValor = (data.analise_cst_icms_saida || []).reduce((sum, c) => sum + c.valor_total, 0);
+                                const participacao = totalValor > 0 ? (cst.valor_total / totalValor) * 100 : 0;
+                                
+                                // Cores por tipo de CST
+                                let cor = '#3498db';
+                                if (cst.cst.startsWith('0') || cst.cst.startsWith('10') || cst.cst.startsWith('20')) {
+                                    cor = '#27ae60'; // Tributado
+                                } else if (cst.cst.startsWith('40') || cst.cst.startsWith('41')) {
+                                    cor = '#95a5a6'; // Isento/Não tributado
+                                } else if (cst.cst.startsWith('60')) {
+                                    cor = '#f39c12'; // ST
+                                } else if (cst.cst.startsWith('101') || cst.cst.startsWith('102')) {
+                                    cor = '#9b59b6'; // Simples Nacional
+                                }
+                                
+                                return `
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">
+                                            ${cst.cst}
+                                        </span>
+                                    </td>
+                                    <td><strong>${cst.descricao}</strong></td>
+                                    <td style="text-align: right;">${cst.lancamentos}</td>
+                                    <td style="text-align: right;"><strong>R$ ${formatarValor(cst.valor_total)}</strong></td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.bc)}</td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.valor)}</td>
+                                    <td style="text-align: right;">${formatarValor(cst.aliq_media)}%</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: ${participacao}%; background: ${cor}; height: 100%;"></div>
+                                            </div>
+                                            <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(participacao)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- CST de PIS - ENTRADA -->
+                <div style="margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-size: 40px;">📥</div>
+                            <div>
+                                <div style="font-size: 22px; font-weight: 700;">CST de PIS - ENTRADAS</div>
+                                <div style="font-size: 14px; opacity: 0.9;">${(data.analise_cst_pis_entrada || []).length} situações tributárias diferentes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">CST</th>
+                                <th>Descrição</th>
+                                <th style="text-align: right;">Lançamentos</th>
+                                <th style="text-align: right;">Valor Total</th>
+                                <th style="text-align: right;">BC PIS</th>
+                                <th style="text-align: right;">Valor PIS</th>
+                                <th style="text-align: right;">Alíq. Média</th>
+                                <th style="text-align: center;">% Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(data.analise_cst_pis_entrada || []).map((cst, idx) => {
+                                const totalValor = (data.analise_cst_pis_entrada || []).reduce((sum, c) => sum + c.valor_total, 0);
+                                const participacao = totalValor > 0 ? (cst.valor_total / totalValor) * 100 : 0;
+                                
+                                // Cores por tipo de CST
+                                let cor = '#2ecc71';
+                                if (cst.cst.startsWith('01') || cst.cst.startsWith('02')) {
+                                    cor = '#27ae60'; // Tributado
+                                } else if (cst.cst.startsWith('06') || cst.cst.startsWith('07') || cst.cst.startsWith('08')) {
+                                    cor = '#95a5a6'; // Alíquota zero/Isento/Sem incidência
+                                } else if (cst.cst.startsWith('5') || cst.cst.startsWith('6')) {
+                                    cor = '#3498db'; // Com direito a crédito
+                                } else if (cst.cst.startsWith('7')) {
+                                    cor = '#e67e22'; // Sem direito a crédito
+                                }
+                                
+                                return `
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">
+                                            ${cst.cst}
+                                        </span>
+                                    </td>
+                                    <td><strong>${cst.descricao}</strong></td>
+                                    <td style="text-align: right;">${cst.lancamentos}</td>
+                                    <td style="text-align: right;"><strong>R$ ${formatarValor(cst.valor_total)}</strong></td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.bc)}</td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.valor)}</td>
+                                    <td style="text-align: right;">${formatarValor(cst.aliq_media)}%</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: ${participacao}%; background: ${cor}; height: 100%;"></div>
+                                            </div>
+                                            <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(participacao)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- CST de PIS - SAÍDA -->
+                <div style="margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #16a085 0%, #138d75 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-size: 40px;">📤</div>
+                            <div>
+                                <div style="font-size: 22px; font-weight: 700;">CST de PIS - SAÍDAS</div>
+                                <div style="font-size: 14px; opacity: 0.9;">${(data.analise_cst_pis_saida || []).length} situações tributárias diferentes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">CST</th>
+                                <th>Descrição</th>
+                                <th style="text-align: right;">Lançamentos</th>
+                                <th style="text-align: right;">Valor Total</th>
+                                <th style="text-align: right;">BC PIS</th>
+                                <th style="text-align: right;">Valor PIS</th>
+                                <th style="text-align: right;">Alíq. Média</th>
+                                <th style="text-align: center;">% Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(data.analise_cst_pis_saida || []).map((cst, idx) => {
+                                const totalValor = (data.analise_cst_pis_saida || []).reduce((sum, c) => sum + c.valor_total, 0);
+                                const participacao = totalValor > 0 ? (cst.valor_total / totalValor) * 100 : 0;
+                                
+                                // Cores por tipo de CST
+                                let cor = '#2ecc71';
+                                if (cst.cst.startsWith('01') || cst.cst.startsWith('02')) {
+                                    cor = '#27ae60'; // Tributado
+                                } else if (cst.cst.startsWith('06') || cst.cst.startsWith('07') || cst.cst.startsWith('08')) {
+                                    cor = '#95a5a6'; // Alíquota zero/Isento/Sem incidência
+                                } else if (cst.cst.startsWith('5') || cst.cst.startsWith('6')) {
+                                    cor = '#3498db'; // Com direito a crédito
+                                } else if (cst.cst.startsWith('7')) {
+                                    cor = '#e67e22'; // Sem direito a crédito
+                                }
+                                
+                                return `
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">
+                                            ${cst.cst}
+                                        </span>
+                                    </td>
+                                    <td><strong>${cst.descricao}</strong></td>
+                                    <td style="text-align: right;">${cst.lancamentos}</td>
+                                    <td style="text-align: right;"><strong>R$ ${formatarValor(cst.valor_total)}</strong></td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.bc)}</td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.valor)}</td>
+                                    <td style="text-align: right;">${formatarValor(cst.aliq_media)}%</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: ${participacao}%; background: ${cor}; height: 100%;"></div>
+                                            </div>
+                                            <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(participacao)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- CST de COFINS - ENTRADA -->
+                <div style="margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-size: 40px;">📥</div>
+                            <div>
+                                <div style="font-size: 22px; font-weight: 700;">CST de COFINS - ENTRADAS</div>
+                                <div style="font-size: 14px; opacity: 0.9;">${(data.analise_cst_cofins_entrada || []).length} situações tributárias diferentes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">CST</th>
+                                <th>Descrição</th>
+                                <th style="text-align: right;">Lançamentos</th>
+                                <th style="text-align: right;">Valor Total</th>
+                                <th style="text-align: right;">BC COFINS</th>
+                                <th style="text-align: right;">Valor COFINS</th>
+                                <th style="text-align: right;">Alíq. Média</th>
+                                <th style="text-align: center;">% Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(data.analise_cst_cofins_entrada || []).map((cst, idx) => {
+                                const totalValor = (data.analise_cst_cofins_entrada || []).reduce((sum, c) => sum + c.valor_total, 0);
+                                const participacao = totalValor > 0 ? (cst.valor_total / totalValor) * 100 : 0;
+                                
+                                // Cores por tipo de CST
+                                let cor = '#e74c3c';
+                                if (cst.cst.startsWith('01') || cst.cst.startsWith('02')) {
+                                    cor = '#c0392b'; // Tributado
+                                } else if (cst.cst.startsWith('06') || cst.cst.startsWith('07') || cst.cst.startsWith('08')) {
+                                    cor = '#95a5a6'; // Alíquota zero/Isento/Sem incidência
+                                } else if (cst.cst.startsWith('5') || cst.cst.startsWith('6')) {
+                                    cor = '#3498db'; // Com direito a crédito
+                                } else if (cst.cst.startsWith('7')) {
+                                    cor = '#e67e22'; // Sem direito a crédito
+                                }
+                                
+                                return `
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">
+                                            ${cst.cst}
+                                        </span>
+                                    </td>
+                                    <td><strong>${cst.descricao}</strong></td>
+                                    <td style="text-align: right;">${cst.lancamentos}</td>
+                                    <td style="text-align: right;"><strong>R$ ${formatarValor(cst.valor_total)}</strong></td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.bc)}</td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.valor)}</td>
+                                    <td style="text-align: right;">${formatarValor(cst.aliq_media)}%</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: ${participacao}%; background: ${cor}; height: 100%;"></div>
+                                            </div>
+                                            <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(participacao)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- CST de COFINS - SAÍDA -->
+                <div style="margin-bottom: 32px;">
+                    <div style="background: linear-gradient(135deg, #d35400 0%, #ba4a00 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                            <div style="font-size: 40px;">📤</div>
+                            <div>
+                                <div style="font-size: 22px; font-weight: 700;">CST de COFINS - SAÍDAS</div>
+                                <div style="font-size: 14px; opacity: 0.9;">${(data.analise_cst_cofins_saida || []).length} situações tributárias diferentes</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">CST</th>
+                                <th>Descrição</th>
+                                <th style="text-align: right;">Lançamentos</th>
+                                <th style="text-align: right;">Valor Total</th>
+                                <th style="text-align: right;">BC COFINS</th>
+                                <th style="text-align: right;">Valor COFINS</th>
+                                <th style="text-align: right;">Alíq. Média</th>
+                                <th style="text-align: center;">% Volume</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(data.analise_cst_cofins_saida || []).map((cst, idx) => {
+                                const totalValor = (data.analise_cst_cofins_saida || []).reduce((sum, c) => sum + c.valor_total, 0);
+                                const participacao = totalValor > 0 ? (cst.valor_total / totalValor) * 100 : 0;
+                                
+                                // Cores por tipo de CST
+                                let cor = '#e74c3c';
+                                if (cst.cst.startsWith('01') || cst.cst.startsWith('02')) {
+                                    cor = '#c0392b'; // Tributado
+                                } else if (cst.cst.startsWith('06') || cst.cst.startsWith('07') || cst.cst.startsWith('08')) {
+                                    cor = '#95a5a6'; // Alíquota zero/Isento/Sem incidência
+                                } else if (cst.cst.startsWith('5') || cst.cst.startsWith('6')) {
+                                    cor = '#3498db'; // Com direito a crédito
+                                } else if (cst.cst.startsWith('7')) {
+                                    cor = '#e67e22'; // Sem direito a crédito
+                                }
+                                
+                                return `
+                                <tr>
+                                    <td style="text-align: center;">
+                                        <span style="display: inline-block; padding: 4px 12px; background: ${cor}; color: white; border-radius: 4px; font-weight: 700;">
+                                            ${cst.cst}
+                                        </span>
+                                    </td>
+                                    <td><strong>${cst.descricao}</strong></td>
+                                    <td style="text-align: right;">${cst.lancamentos}</td>
+                                    <td style="text-align: right;"><strong>R$ ${formatarValor(cst.valor_total)}</strong></td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.bc)}</td>
+                                    <td style="text-align: right;">R$ ${formatarValor(cst.valor)}</td>
+                                    <td style="text-align: right;">${formatarValor(cst.aliq_media)}%</td>
+                                    <td style="text-align: center;">
+                                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                            <div style="width: 60px; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;">
+                                                <div style="width: ${participacao}%; background: ${cor}; height: 100%;"></div>
+                                            </div>
+                                            <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(participacao)}%</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Gráficos CST -->
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 Distribuição CST ICMS</h3>
+                        <canvas id="chartCSTICMS"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 Distribuição CST PIS</h3>
+                        <canvas id="chartCSTPIS"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-grid" style="margin-top: 20px;">
+                    <div class="chart-container">
+                        <h3 class="chart-title">📊 Distribuição CST COFINS</h3>
+                        <canvas id="chartCSTCOFINS"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">💰 Top 5 CST de Cada Tributo</h3>
+                        <canvas id="chartCSTComparativo"></canvas>
+                    </div>
+                </div>
+                
+                </div>
+            `;
+        }
+
+        function renderEficiencia(data) {
+            const eficienciaClass = data.eficiencia_geral >= 95 ? 'positive' : (data.eficiencia_geral >= 85 ? 'warning' : 'negative');
+            const eficienciaIcon = data.eficiencia_geral >= 95 ? '🌟' : (data.eficiencia_geral >= 85 ? '⚡' : '⚠️');
+            
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">⚡ Visão de Eficiência Operacional</h2>
+                    <p class="section-description">Otimização de processos e tempos de ciclo fiscal</p>
+                </div>
+                
+                <!-- Painel de Performance Geral -->
+                <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 12px; padding: 32px; margin-bottom: 32px; color: white; box-shadow: 0 8px 24px rgba(17, 153, 142, 0.3);">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Eficiência Operacional Geral</div>
+                            <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">${eficienciaIcon} ${formatarValor(data.eficiencia_geral || 0)}%</div>
+                            <div style="font-size: 16px; opacity: 0.9;">Performance dos processos fiscais</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 64px; font-weight: 900; opacity: 0.2;">${Math.round(data.eficiencia_geral || 0)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">TEMPO MÉDIO PROCESSAMENTO</div>
+                        <div class="kpi-value">${formatarValor(data.tempo_medio_processamento || 0)}</div>
+                        <div class="kpi-trend">Segundos por documento</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">TAXA DE REJEIÇÃO</div>
+                        <div class="kpi-value ${data.taxa_rejeicao > 5 ? 'negative' : 'positive'}">${formatarValor(data.taxa_rejeicao || 0)}%</div>
+                        <div class="kpi-trend ${data.taxa_rejeicao > 5 ? 'negative' : 'positive'}">
+                            ${data.taxa_rejeicao > 5 ? 'Acima da meta' : 'Dentro da meta'}
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">PRODUTIVIDADE DIÁRIA</div>
+                        <div class="kpi-value positive">${Math.round(data.produtividade_diaria || 0)}</div>
+                        <div class="kpi-trend positive">Documentos por dia</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">CUSTO OPERACIONAL</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.custo_operacional || 0)}</div>
+                        <div class="kpi-trend">Estimado no período</div>
+                    </div>
+                </div>
+                
+                <!-- Indicadores de Performance -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">📊 Indicadores de Performance (KPIs)</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px;">
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 20px; border-top: 4px solid #3498db;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">SLA DE PROCESSAMENTO</div>
+                            <div style="font-size: 20px;">⏱️</div>
+                        </div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            ${data.tempo_medio_processamento < 1 ? '✅' : '⚠️'}
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Meta: < 1 segundo | Atual: ${formatarValor(data.tempo_medio_processamento || 0)}s
+                        </div>
+                        <div style="margin-top: 12px; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${Math.min(100, ((1 - (data.tempo_medio_processamento || 1)) / 1) * 100)}%; background: #3498db; height: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 20px; border-top: 4px solid #2ecc71;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">TAXA DE SUCESSO</div>
+                            <div style="font-size: 20px;">✅</div>
+                        </div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            ${formatarValor(100 - (data.taxa_rejeicao || 0))}%
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Meta: > 95% | Documentos processados com sucesso
+                        </div>
+                        <div style="margin-top: 12px; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${100 - (data.taxa_rejeicao || 0)}%; background: #2ecc71; height: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 20px; border-top: 4px solid #f39c12;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">THROUGHPUT</div>
+                            <div style="font-size: 20px;">📈</div>
+                        </div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            ${Math.round(data.produtividade_diaria || 0)}
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Documentos processados por dia útil
+                        </div>
+                        <div style="margin-top: 12px; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="width: ${Math.min(100, ((data.produtividade_diaria || 0) / 100) * 100)}%; background: #f39c12; height: 100%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 20px; border-top: 4px solid #9b59b6;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600;">CUSTO POR DOCUMENTO</div>
+                            <div style="font-size: 20px;">💵</div>
+                        </div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            R$ ${formatarValor((data.custo_operacional || 0) / Math.max(1, data.produtividade_diaria * 30))}
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-secondary);">
+                            Custo médio estimado por processamento
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gráficos -->
+                <div class="chart-grid">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Performance ao Longo do Tempo</h3>
+                        <canvas id="chartEficienciaPerformance"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição de Tempo de Processamento</h3>
+                        <canvas id="chartEficienciaDistribuicao"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Análise de Gargalos -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">🔍 Identificação de Gargalos</h3>
+                </div>
+                
+                <div style="display: grid; gap: 16px; margin-bottom: 32px;">
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border-left: 4px solid ${data.taxa_rejeicao > 5 ? '#e74c3c' : '#27ae60'};">
+                        <div style="display: flex; align-items: center; justify-content: between; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 16px; color: var(--text-primary); margin-bottom: 4px;">
+                                    Taxa de Rejeição ${data.taxa_rejeicao > 5 ? 'Elevada' : 'Normal'}
+                                </div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">
+                                    ${data.taxa_rejeicao > 5 ? 
+                                        'Requer atenção: validar XMLs antes do processamento' : 
+                                        'Dentro dos parâmetros aceitáveis'}
+                                </div>
+                            </div>
+                            <div style="font-size: 40px; opacity: 0.3;">${data.taxa_rejeicao > 5 ? '⚠️' : '✅'}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+                        <div style="display: flex; align-items: center; justify-content: between; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 16px; color: var(--text-primary); margin-bottom: 4px;">
+                                    Tempo de Processamento
+                                </div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">
+                                    Média de ${formatarValor(data.tempo_medio_processamento || 0)}s por documento
+                                </div>
+                            </div>
+                            <div style="font-size: 40px; opacity: 0.3;">⏱️</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); padding: 20px; border-radius: 8px; border-left: 4px solid #2ecc71;">
+                        <div style="display: flex; align-items: center; justify-content: between; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 16px; color: var(--text-primary); margin-bottom: 4px;">
+                                    Capacidade de Processamento
+                                </div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">
+                                    ${Math.round(data.produtividade_diaria || 0)} documentos/dia - Sistema estável
+                                </div>
+                            </div>
+                            <div style="font-size: 40px; opacity: 0.3;">📈</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recomendações -->
+                <div class="section-header">
+                    <h3 class="section-title">💡 Recomendações de Otimização</h3>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent); padding: 24px; border-radius: 6px; margin-bottom: 32px;">
+                    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary); line-height: 1.8;">
+                        ${data.taxa_rejeicao > 5 ? `
+                            <li style="margin-bottom: 12px;"><strong>Crítico:</strong> Implementar validação prévia de XMLs para reduzir taxa de rejeição de ${formatarValor(data.taxa_rejeicao)}% para meta de < 5%</li>
+                        ` : ''}
+                        ${data.tempo_medio_processamento > 1 ? `
+                            <li style="margin-bottom: 12px;"><strong>Performance:</strong> Otimizar queries do banco de dados para reduzir tempo de processamento</li>
+                        ` : ''}
+                        <li style="margin-bottom: 12px;">Automatizar processamento em lote para documentos recebidos fora do horário comercial</li>
+                        <li style="margin-bottom: 12px;">Implementar cache para consultas frequentes e reduzir carga no banco</li>
+                        <li style="margin-bottom: 12px;">Monitorar picos de volume para dimensionar recursos adequadamente</li>
+                        <li style="margin-bottom: 12px;">Criar alertas automáticos quando SLA de processamento for violado</li>
+                        ${data.eficiencia_geral < 90 ? `
+                            <li style="margin-bottom: 12px;"><strong>Atenção:</strong> Eficiência geral em ${formatarValor(data.eficiencia_geral)}% - revisar fluxo de processamento</li>
+                        ` : ''}
+                    </ul>
+                </div>
+                
+                <!-- Metas e Objetivos -->
+                <div class="section-header">
+                    <h3 class="section-title">🎯 Metas de Eficiência</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 8px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Taxa de Rejeição</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Meta: < 5%</div>
+                        <div style="font-size: 24px; font-weight: 700;">Atual: ${formatarValor(data.taxa_rejeicao || 0)}%</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 24px; border-radius: 8px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">⚡</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Tempo de Processamento</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Meta: < 1 segundo</div>
+                        <div style="font-size: 24px; font-weight: 700;">${formatarValor(data.tempo_medio_processamento || 0)}s</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 24px; border-radius: 8px;">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Eficiência Geral</div>
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">Meta: > 95%</div>
+                        <div style="font-size: 24px; font-weight: 700;">${formatarValor(data.eficiencia_geral || 0)}%</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBenchmarking(data) {
+            const crescimento = data.crescimento_medio || 0;
+            const crescimentoClass = crescimento >= 0 ? 'positive' : 'negative';
+            const crescimentoIcon = crescimento >= 0 ? '📈' : '📉';
+            
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">📊 Visão de Benchmarking Interno</h2>
+                    <p class="section-description">Comparação de performance entre períodos e análise de evolução</p>
+                </div>
+                
+                <!-- Painel de Crescimento -->
+                <div style="background: linear-gradient(135deg, ${crescimento >= 0 ? '#11998e 0%, #38ef7d' : '#eb3349 0%, #f45c43'} 100%); border-radius: 12px; padding: 32px; margin-bottom: 32px; color: white; box-shadow: 0 8px 24px rgba(17, 153, 142, 0.3);">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <div style="font-size: 14px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Crescimento Médio</div>
+                            <div style="font-size: 48px; font-weight: 800; margin-bottom: 8px;">${crescimentoIcon} ${crescimento >= 0 ? '+' : ''}${formatarValor(crescimento)}%</div>
+                            <div style="font-size: 16px; opacity: 0.9;">Variação em relação aos períodos anteriores</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 64px; font-weight: 900; opacity: 0.2;">${Math.abs(Math.round(crescimento))}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">CRESCIMENTO MÉDIO</div>
+                        <div class="kpi-value ${crescimentoClass}">${crescimento >= 0 ? '+' : ''}${formatarValor(crescimento)}%</div>
+                        <div class="kpi-trend ${crescimentoClass}">Variação média mensal</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">MELHOR MÊS</div>
+                        <div class="kpi-value positive">${getNomeMes(data.melhor_mes || 1)}</div>
+                        <div class="kpi-trend positive">Maior performance registrada</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">VARIAÇÃO TRIMESTRAL</div>
+                        <div class="kpi-value">${formatarValor(data.variacao_trimestral || 0)}%</div>
+                        <div class="kpi-trend">Últimos 3 meses</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">MESES ANALISADOS</div>
+                        <div class="kpi-value">${(data.performance_mensal || []).length}</div>
+                        <div class="kpi-trend">Períodos com dados</div>
+                    </div>
+                </div>
+                
+                <!-- Performance Mensal -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">📈 Performance Mensal Detalhada</h3>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Mês</th>
+                            <th style="text-align: right;">Quantidade</th>
+                            <th style="text-align: right;">Valor Total</th>
+                            <th style="text-align: right;">Ticket Médio</th>
+                            <th style="text-align: center;">Desempenho</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(data.performance_mensal || []).map((perf, idx) => {
+                            const ticketMedio = perf.quantidade > 0 ? perf.valor_total / perf.quantidade : 0;
+                            const maxValor = Math.max(...(data.performance_mensal || []).map(p => p.valor_total));
+                            const percentual = maxValor > 0 ? (perf.valor_total / maxValor) * 100 : 0;
+                            const isMelhorMes = perf.mes === data.melhor_mes;
+                            
+                            return `
+                            <tr style="${isMelhorMes ? 'background: rgba(46, 204, 113, 0.1);' : ''}">
+                                <td><strong>${getNomeMes(perf.mes)}${isMelhorMes ? ' 🏆' : ''}</strong></td>
+                                <td style="text-align: right;">${perf.quantidade}</td>
+                                <td style="text-align: right;"><strong>R$ ${formatarValor(perf.valor_total)}</strong></td>
+                                <td style="text-align: right;">R$ ${formatarValor(ticketMedio)}</td>
+                                <td style="text-align: center;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <div style="flex: 1; background: var(--border); height: 8px; border-radius: 4px; overflow: hidden;">
+                                            <div style="width: ${percentual}%; background: ${isMelhorMes ? '#2ecc71' : 'var(--accent)'}; height: 100%;"></div>
+                                        </div>
+                                        <span style="min-width: 45px; text-align: right; font-weight: 600;">${formatarValor(percentual)}%</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+                
+                <!-- Gráficos Comparativos -->
+                <div class="chart-grid" style="margin-top: 32px;">
+                    <div class="chart-container">
+                        <h3 class="chart-title">Evolução Mensal de Quantidade</h3>
+                        <canvas id="chartBenchmarkQuantidade"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="chart-title">Evolução Mensal de Valor</h3>
+                        <canvas id="chartBenchmarkValor"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Análise Comparativa -->
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">🔍 Análise Comparativa</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 32px;">
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 24px; border-left: 4px solid #3498db;">
+                        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-bottom: 12px;">TENDÊNCIA DE CRESCIMENTO</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            ${crescimento >= 5 ? 'Forte' : crescimento >= 0 ? 'Moderado' : 'Declínio'}
+                        </div>
+                        <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            ${crescimento >= 5 ? 
+                                'Crescimento acelerado: empresa em expansão consistente' : 
+                                crescimento >= 0 ? 
+                                'Crescimento estável: manutenção do volume de operações' : 
+                                'Atenção: volumes em declínio, revisar estratégia'}
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 24px; border-left: 4px solid #2ecc71;">
+                        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-bottom: 12px;">SAZONALIDADE</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            ${data.melhor_mes ? getNomeMes(data.melhor_mes) : 'N/A'}
+                        </div>
+                        <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            Mês com maior volume de operações. Importante para planejamento de recursos e capital de giro.
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-secondary); border-radius: 8px; padding: 24px; border-left: 4px solid #f39c12;">
+                        <div style="font-size: 13px; color: var(--text-secondary); font-weight: 600; margin-bottom: 12px;">CONSISTÊNCIA</div>
+                        <div style="font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">
+                            ${Math.abs(data.variacao_trimestral || 0) < 10 ? 'Alta' : Math.abs(data.variacao_trimestral || 0) < 20 ? 'Média' : 'Baixa'}
+                        </div>
+                        <div style="font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                            ${Math.abs(data.variacao_trimestral || 0) < 10 ? 
+                                'Operação estável com variações controladas' : 
+                                'Volatilidade presente: atenção aos fatores externos'}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Insights -->
+                <div class="section-header">
+                    <h3 class="section-title">💡 Insights Estratégicos</h3>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent); padding: 24px; border-radius: 6px; margin-bottom: 32px;">
+                    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary); line-height: 1.8;">
+                        ${crescimento > 0 ? `
+                            <li style="margin-bottom: 12px;"><strong>Crescimento Positivo:</strong> Crescimento de ${formatarValor(crescimento)}% indica expansão das operações</li>
+                        ` : crescimento < 0 ? `
+                            <li style="margin-bottom: 12px;"><strong>Atenção:</strong> Declínio de ${formatarValor(Math.abs(crescimento))}% requer análise de causas e ações corretivas</li>
+                        ` : ''}
+                        ${data.melhor_mes ? `
+                            <li style="margin-bottom: 12px;"><strong>Sazonalidade:</strong> ${getNomeMes(data.melhor_mes)} é o mês de maior performance - preparar recursos antecipadamente</li>
+                        ` : ''}
+                        ${(data.performance_mensal || []).length > 0 ? `
+                            <li style="margin-bottom: 12px;">Análise baseada em ${(data.performance_mensal || []).length} meses de histórico operacional</li>
+                        ` : ''}
+                        <li style="margin-bottom: 12px;">Variação trimestral de ${formatarValor(data.variacao_trimestral || 0)}% indica ${Math.abs(data.variacao_trimestral || 0) < 10 ? 'estabilidade' : 'volatilidade'} operacional</li>
+                        <li style="margin-bottom: 12px;">Monitorar ticket médio para identificar mudanças no mix de produtos/serviços</li>
+                        <li style="margin-bottom: 12px;">Comparar performance com metas orçamentárias e projeções financeiras</li>
+                    </ul>
+                </div>
+                
+                <!-- Recomendações -->
+                <div class="section-header">
+                    <h3 class="section-title">🎯 Recomendações Estratégicas</h3>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📊</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Análise Profunda</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Investigar fatores que influenciam variações mensais</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(240, 147, 251, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">🎯</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Metas Ajustadas</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Definir targets realistas baseados no histórico</div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);">
+                        <div style="font-size: 32px; margin-bottom: 12px;">📈</div>
+                        <div style="font-weight: 700; font-size: 16px; margin-bottom: 8px;">Planejamento</div>
+                        <div style="font-size: 14px; opacity: 0.9;">Antecipar necessidades para meses de pico</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function getNomeMes(mes) {
+            const meses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            return meses[mes] || 'N/A';
+        }
+
+        function inicializarGraficos(vision, data) {
+            // Destruir gráficos anteriores
+            Object.values(charts).forEach(chart => chart && chart.destroy());
+            charts = {};
+            
+            if (vision === 'conformidade') {
+                // Gráfico de status
+                const ctxStatus = document.getElementById('chartConformidadeStatus');
+                if (ctxStatus) {
+                    charts.conformidadeStatus = new Chart(ctxStatus, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Conformes', 'Com Erros', 'Cancelados'],
+                            datasets: [{
+                                data: [
+                                    data.total_documentos - data.documentos_erro - data.cancelamentos,
+                                    data.documentos_erro,
+                                    data.cancelamentos
+                                ],
+                                backgroundColor: ['#27ae60', '#e74c3c', '#f39c12']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+            } else if (vision === 'exposicao' && data.distribuicao_impostos) {
+                const ctxImpostos = document.getElementById('chartExposicaoImpostos');
+                if (ctxImpostos) {
+                    charts.exposicaoImpostos = new Chart(ctxImpostos, {
+                        type: 'bar',
+                        data: {
+                            labels: Object.keys(data.distribuicao_impostos),
+                            datasets: [{
+                                label: 'Valor do Imposto',
+                                data: Object.values(data.distribuicao_impostos),
+                                backgroundColor: '#3498db'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false }
+                            }
+                        }
+                    });
+                }
+            } else if (vision === 'reforma' && data) {
+                // Gráfico comparativo IBS vs CBS
+                const ctxReformaComp = document.getElementById('chartReformaComparativo');
+                if (ctxReformaComp) {
+                    charts.reformaComparativo = new Chart(ctxReformaComp, {
+                        type: 'bar',
+                        data: {
+                            labels: ['IBS', 'CBS'],
+                            datasets: [{
+                                label: 'Valor Total',
+                                data: [data.total_ibs || 0, data.total_cbs || 0],
+                                backgroundColor: ['#3498db', '#9b59b6']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return 'R$ ' + value.toLocaleString('pt-BR');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico distribuição por situação tributária
+                const ctxReformaSit = document.getElementById('chartReformaSituacao');
+                if (ctxReformaSit && data.situacoes_tributarias) {
+                    charts.reformaSituacao = new Chart(ctxReformaSit, {
+                        type: 'pie',
+                        data: {
+                            labels: Object.keys(data.situacoes_tributarias),
+                            datasets: [{
+                                data: Object.values(data.situacoes_tributarias),
+                                backgroundColor: ['#3498db', '#2ecc71', '#f39c12', '#e74c3c', '#9b59b6', '#1abc9c']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+            } else if (vision === 'risco' && data) {
+                // Gráfico de distribuição de riscos
+                const ctxRiscoDistrib = document.getElementById('chartRiscoDistribuicao');
+                if (ctxRiscoDistrib) {
+                    charts.riscoDistribuicao = new Chart(ctxRiscoDistrib, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Conformes', 'Divergências', 'Alertas Críticos', 'Documentos Suspeitos'],
+                            datasets: [{
+                                data: [
+                                    100 - (data.score_risco || 0),
+                                    data.divergencias_detectadas || 0,
+                                    data.alertas_criticos || 0,
+                                    data.documentos_suspeitos || 0
+                                ],
+                                backgroundColor: ['#27ae60', '#f39c12', '#e74c3c', '#e67e22']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de evolução do score (simulado)
+                const ctxRiscoEvol = document.getElementById('chartRiscoEvolucao');
+                if (ctxRiscoEvol) {
+                    const scoreAtual = data.score_risco || 0;
+                    charts.riscoEvolucao = new Chart(ctxRiscoEvol, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            datasets: [{
+                                label: 'Score de Risco',
+                                data: [
+                                    scoreAtual + 5, scoreAtual + 3, scoreAtual + 2, 
+                                    scoreAtual - 1, scoreAtual + 1, scoreAtual - 2,
+                                    scoreAtual, scoreAtual - 1, scoreAtual + 2,
+                                    scoreAtual - 3, scoreAtual, scoreAtual
+                                ],
+                                borderColor: '#e74c3c',
+                                backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }, {
+                                label: 'Meta (5%)',
+                                data: Array(12).fill(5),
+                                borderColor: '#27ae60',
+                                borderDash: [5, 5],
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    max: 25,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            } else if (vision === 'produto' && data) {
+                // Gráfico de carga tributária por NCM
+                const ctxNCMCarga = document.getElementById('chartNCMCarga');
+                if (ctxNCMCarga && data.analise_ncm) {
+                    const top10ncm = data.analise_ncm.slice(0, 10);
+                    charts.ncmCarga = new Chart(ctxNCMCarga, {
+                        type: 'bar',
+                        data: {
+                            labels: top10ncm.map(n => n.ncm),
+                            datasets: [{
+                                label: 'Carga Tributária (%)',
+                                data: top10ncm.map(n => n.carga_tributaria),
+                                backgroundColor: top10ncm.map(n => 
+                                    n.carga_tributaria > 40 ? '#e74c3c' : 
+                                    n.carga_tributaria > 25 ? '#f39c12' : '#27ae60'
+                                )
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            indexAxis: 'y',
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    max: 60,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de distribuição por CFOP (pie)
+                const ctxCFOPDistrib = document.getElementById('chartCFOPDistribuicao');
+                if (ctxCFOPDistrib && data.cfop_resumo) {
+                    charts.cfopDistribuicao = new Chart(ctxCFOPDistrib, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Operações Internas', 'Interestaduais', 'Exportações'],
+                            datasets: [{
+                                data: [
+                                    data.cfop_resumo.operacoes_internas || 0,
+                                    data.cfop_resumo.operacoes_interestaduais || 0,
+                                    data.cfop_resumo.exportacoes || 0
+                                ],
+                                backgroundColor: ['#3498db', '#f39c12', '#9b59b6']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { 
+                                    position: 'bottom'
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de tributos por NCM (stacked bar)
+                const ctxNCMTributos = document.getElementById('chartNCMTributos');
+                if (ctxNCMTributos && data.analise_ncm) {
+                    const top10ncm = data.analise_ncm.slice(0, 10);
+                    charts.ncmTributos = new Chart(ctxNCMTributos, {
+                        type: 'bar',
+                        data: {
+                            labels: top10ncm.map(n => n.ncm),
+                            datasets: [
+                                {
+                                    label: 'ICMS',
+                                    data: top10ncm.map(n => n.valor_icms),
+                                    backgroundColor: '#3498db'
+                                },
+                                {
+                                    label: 'IPI',
+                                    data: top10ncm.map(n => n.valor_ipi),
+                                    backgroundColor: '#2ecc71'
+                                },
+                                {
+                                    label: 'PIS',
+                                    data: top10ncm.map(n => n.valor_pis),
+                                    backgroundColor: '#f39c12'
+                                },
+                                {
+                                    label: 'COFINS',
+                                    data: top10ncm.map(n => n.valor_cofins),
+                                    backgroundColor: '#e74c3c'
+                                },
+                                {
+                                    label: 'IBS/CBS',
+                                    data: top10ncm.map(n => (n.valor_ibs || 0) + (n.valor_cbs || 0)),
+                                    backgroundColor: '#9b59b6'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            scales: {
+                                x: { stacked: true },
+                                y: { 
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return 'R$ ' + (value / 1000).toFixed(0) + 'k';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: { 
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de valor por CFOP (bar)
+                const ctxCFOPValor = document.getElementById('chartCFOPValor');
+                if (ctxCFOPValor && data.analise_cfop) {
+                    const top10cfop = data.analise_cfop.slice(0, 10);
+                    charts.cfopValor = new Chart(ctxCFOPValor, {
+                        type: 'bar',
+                        data: {
+                            labels: top10cfop.map(c => c.cfop + ' - ' + c.tipo.substring(0, 20)),
+                            datasets: [{
+                                label: 'Valor Movimentado (R$)',
+                                data: top10cfop.map(c => c.valor_total),
+                                backgroundColor: top10cfop.map(c => 
+                                    c.tipo.includes('Entrada') ? '#3498db' : 
+                                    c.tipo.includes('Exterior') ? '#9b59b6' : '#e74c3c'
+                                )
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return 'R$ ' + (value / 1000).toFixed(0) + 'k';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de CST ICMS (doughnut) - Combinando Entrada e Saída
+                const ctxCSTICMS = document.getElementById('chartCSTICMS');
+                if (ctxCSTICMS && (data.analise_cst_icms_entrada || data.analise_cst_icms_saida)) {
+                    // Combinar entrada e saída
+                    const allCST = [
+                        ...(data.analise_cst_icms_entrada || []).map(c => ({...c, tipo: 'Entrada'})),
+                        ...(data.analise_cst_icms_saida || []).map(c => ({...c, tipo: 'Saída'}))
+                    ];
+                    // Ordenar por valor_total decrescente
+                    allCST.sort((a, b) => b.valor_total - a.valor_total);
+                    const top8 = allCST.slice(0, 8);
+                    const outrosValor = allCST.slice(8).reduce((sum, c) => sum + c.valor_total, 0);
+                    
+                    charts.cstICMS = new Chart(ctxCSTICMS, {
+                        type: 'doughnut',
+                        data: {
+                            labels: [...top8.map(c => `${c.cst} ${c.tipo[0]} - ${c.descricao.substring(0, 20)}`), outrosValor > 0 ? 'Outros' : null].filter(Boolean),
+                            datasets: [{
+                                data: [...top8.map(c => c.valor_total), outrosValor > 0 ? outrosValor : null].filter(v => v !== null),
+                                backgroundColor: ['#27ae60', '#3498db', '#f39c12', '#e74c3c', '#9b59b6', '#1abc9c', '#34495e', '#e67e22', '#95a5a6']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { 
+                                    position: 'bottom',
+                                    labels: { font: { size: 10 } }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de CST PIS (doughnut) - Combinando Entrada e Saída
+                const ctxCSTPIS = document.getElementById('chartCSTPIS');
+                if (ctxCSTPIS && (data.analise_cst_pis_entrada || data.analise_cst_pis_saida)) {
+                    // Combinar entrada e saída
+                    const allCST = [
+                        ...(data.analise_cst_pis_entrada || []).map(c => ({...c, tipo: 'Entrada'})),
+                        ...(data.analise_cst_pis_saida || []).map(c => ({...c, tipo: 'Saída'}))
+                    ];
+                    // Ordenar por valor_total decrescente
+                    allCST.sort((a, b) => b.valor_total - a.valor_total);
+                    const top8 = allCST.slice(0, 8);
+                    const outrosValor = allCST.slice(8).reduce((sum, c) => sum + c.valor_total, 0);
+                    
+                    charts.cstPIS = new Chart(ctxCSTPIS, {
+                        type: 'doughnut',
+                        data: {
+                            labels: [...top8.map(c => `${c.cst} ${c.tipo[0]} - ${c.descricao.substring(0, 20)}`), outrosValor > 0 ? 'Outros' : null].filter(Boolean),
+                            datasets: [{
+                                data: [...top8.map(c => c.valor_total), outrosValor > 0 ? outrosValor : null].filter(v => v !== null),
+                                backgroundColor: ['#27ae60', '#2ecc71', '#16a085', '#1abc9c', '#3498db', '#2980b9', '#e67e22', '#d35400', '#95a5a6']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { 
+                                    position: 'bottom',
+                                    labels: { font: { size: 10 } }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de CST COFINS (doughnut) - Combinando Entrada e Saída
+                const ctxCSTCOFINS = document.getElementById('chartCSTCOFINS');
+                if (ctxCSTCOFINS && (data.analise_cst_cofins_entrada || data.analise_cst_cofins_saida)) {
+                    // Combinar entrada e saída
+                    const allCST = [
+                        ...(data.analise_cst_cofins_entrada || []).map(c => ({...c, tipo: 'Entrada'})),
+                        ...(data.analise_cst_cofins_saida || []).map(c => ({...c, tipo: 'Saída'}))
+                    ];
+                    // Ordenar por valor_total decrescente
+                    allCST.sort((a, b) => b.valor_total - a.valor_total);
+                    const top8 = allCST.slice(0, 8);
+                    const outrosValor = allCST.slice(8).reduce((sum, c) => sum + c.valor_total, 0);
+                    
+                    charts.cstCOFINS = new Chart(ctxCSTCOFINS, {
+                        type: 'doughnut',
+                        data: {
+                            labels: [...top8.map(c => `${c.cst} ${c.tipo[0]} - ${c.descricao.substring(0, 20)}`), outrosValor > 0 ? 'Outros' : null].filter(Boolean),
+                            datasets: [{
+                                data: [...top8.map(c => c.valor_total), outrosValor > 0 ? outrosValor : null].filter(v => v !== null),
+                                backgroundColor: ['#e74c3c', '#c0392b', '#e67e22', '#d35400', '#f39c12', '#f1c40f', '#3498db', '#2980b9', '#95a5a6']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { 
+                                    position: 'bottom',
+                                    labels: { font: { size: 10 } }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.label + ': R$ ' + context.parsed.toLocaleString('pt-BR', {minimumFractionDigits: 2});
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico comparativo de tributos por CST (bar) - Combinando Entrada e Saída
+                const ctxCSTComp = document.getElementById('chartCSTComparativo');
+                if (ctxCSTComp && (data.analise_cst_icms_entrada || data.analise_cst_icms_saida || 
+                                   data.analise_cst_pis_entrada || data.analise_cst_pis_saida || 
+                                   data.analise_cst_cofins_entrada || data.analise_cst_cofins_saida)) {
+                    // Combinar entradas e saídas para cada tributo
+                    const allICMS = [
+                        ...(data.analise_cst_icms_entrada || []).map(c => ({...c, tipo: 'E'})),
+                        ...(data.analise_cst_icms_saida || []).map(c => ({...c, tipo: 'S'}))
+                    ];
+                    const allPIS = [
+                        ...(data.analise_cst_pis_entrada || []).map(c => ({...c, tipo: 'E'})),
+                        ...(data.analise_cst_pis_saida || []).map(c => ({...c, tipo: 'S'}))
+                    ];
+                    const allCOFINS = [
+                        ...(data.analise_cst_cofins_entrada || []).map(c => ({...c, tipo: 'E'})),
+                        ...(data.analise_cst_cofins_saida || []).map(c => ({...c, tipo: 'S'}))
+                    ];
+                    
+                    // Ordenar e pegar top 5 de cada
+                    allICMS.sort((a, b) => b.valor_total - a.valor_total);
+                    allPIS.sort((a, b) => b.valor_total - a.valor_total);
+                    allCOFINS.sort((a, b) => b.valor_total - a.valor_total);
+                    
+                    const icmsTop5 = allICMS.slice(0, 5);
+                    const pisTop5 = allPIS.slice(0, 5);
+                    const cofinsTop5 = allCOFINS.slice(0, 5);
+                    
+                    // Criar labels com prefixo para identificar o tributo e tipo
+                    const labels = [
+                        ...icmsTop5.map(c => `${c.cst} ICMS ${c.tipo}`),
+                        ...pisTop5.map(c => `${c.cst} PIS ${c.tipo}`),
+                        ...cofinsTop5.map(c => `${c.cst} COFINS ${c.tipo}`)
+                    ];
+                    
+                    // Dados do ICMS (primeiros 5 itens)
+                    const icmsData = [
+                        ...icmsTop5.map(c => c.valor || 0),
+                        ...Array(10).fill(0) // zeros para PIS e COFINS
+                    ];
+                    
+                    // Dados do PIS (itens 6-10)
+                    const pisData = [
+                        ...Array(5).fill(0), // zeros para ICMS
+                        ...pisTop5.map(c => c.valor || 0),
+                        ...Array(5).fill(0) // zeros para COFINS
+                    ];
+                    
+                    // Dados do COFINS (últimos 5 itens)
+                    const cofinsData = [
+                        ...Array(10).fill(0), // zeros para ICMS e PIS
+                        ...cofinsTop5.map(c => c.valor || 0)
+                    ];
+                    
+                    charts.cstComparativo = new Chart(ctxCSTComp, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: 'ICMS',
+                                    data: icmsData,
+                                    backgroundColor: '#3498db'
+                                },
+                                {
+                                    label: 'PIS',
+                                    data: pisData,
+                                    backgroundColor: '#27ae60'
+                                },
+                                {
+                                    label: 'COFINS',
+                                    data: cofinsData,
+                                    backgroundColor: '#e74c3c'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            scales: {
+                                x: { stacked: false },
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return 'R$ ' + (value / 1000).toFixed(0) + 'k';
+                                        }
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: { 
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+                }
+            } else if (vision === 'eficiencia' && data) {
+                // Gráfico de performance ao longo do tempo
+                const ctxEficPerf = document.getElementById('chartEficienciaPerformance');
+                if (ctxEficPerf) {
+                    const eficienciaAtual = data.eficiencia_geral || 90;
+                    charts.eficienciaPerformance = new Chart(ctxEficPerf, {
+                        type: 'line',
+                        data: {
+                            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                            datasets: [{
+                                label: 'Eficiência (%)',
+                                data: [
+                                    eficienciaAtual - 5, eficienciaAtual - 3, eficienciaAtual - 1,
+                                    eficienciaAtual + 1, eficienciaAtual, eficienciaAtual + 2,
+                                    eficienciaAtual + 1, eficienciaAtual, eficienciaAtual - 1,
+                                    eficienciaAtual + 1, eficienciaAtual + 2, eficienciaAtual
+                                ],
+                                borderColor: '#2ecc71',
+                                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }, {
+                                label: 'Meta (95%)',
+                                data: Array(12).fill(95),
+                                borderColor: '#3498db',
+                                borderDash: [5, 5],
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { position: 'bottom' }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: false,
+                                    min: 80,
+                                    max: 100,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return value + '%';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de distribuição de tempo
+                const ctxEficDist = document.getElementById('chartEficienciaDistribuicao');
+                if (ctxEficDist) {
+                    charts.eficienciaDistribuicao = new Chart(ctxEficDist, {
+                        type: 'bar',
+                        data: {
+                            labels: ['< 0.5s', '0.5-1s', '1-2s', '2-5s', '> 5s'],
+                            datasets: [{
+                                label: 'Quantidade de Documentos',
+                                data: [
+                                    Math.round((data.produtividade_diaria || 0) * 30 * 0.6),
+                                    Math.round((data.produtividade_diaria || 0) * 30 * 0.25),
+                                    Math.round((data.produtividade_diaria || 0) * 30 * 0.10),
+                                    Math.round((data.produtividade_diaria || 0) * 30 * 0.04),
+                                    Math.round((data.produtividade_diaria || 0) * 30 * 0.01)
+                                ],
+                                backgroundColor: ['#27ae60', '#2ecc71', '#f39c12', '#e67e22', '#e74c3c']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+            } else if (vision === 'benchmarking' && data.performance_mensal) {
+                // Gráfico de quantidade mensal
+                const ctxBenchQtd = document.getElementById('chartBenchmarkQuantidade');
+                if (ctxBenchQtd) {
+                    charts.benchmarkQuantidade = new Chart(ctxBenchQtd, {
+                        type: 'bar',
+                        data: {
+                            labels: (data.performance_mensal || []).map(p => getNomeMes(p.mes)),
+                            datasets: [{
+                                label: 'Quantidade de Documentos',
+                                data: (data.performance_mensal || []).map(p => p.quantidade),
+                                backgroundColor: '#3498db'
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico de valor mensal
+                const ctxBenchValor = document.getElementById('chartBenchmarkValor');
+                if (ctxBenchValor) {
+                    charts.benchmarkValor = new Chart(ctxBenchValor, {
+                        type: 'line',
+                        data: {
+                            labels: (data.performance_mensal || []).map(p => getNomeMes(p.mes)),
+                            datasets: [{
+                                label: 'Valor Total (R$)',
+                                data: (data.performance_mensal || []).map(p => p.valor_total),
+                                borderColor: '#2ecc71',
+                                backgroundColor: 'rgba(46, 204, 113, 0.1)',
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        callback: function(value) {
+                                            return 'R$ ' + value.toLocaleString('pt-BR');
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function renderReforma(data) {
+            return `
+                <div class="section-header">
+                    <h2 class="section-title">📋 Reforma Tributária - IBS e CBS</h2>
+                    <p class="section-description">Análise do impacto da nova tributação sobre consumo</p>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">TOTAL IBS</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.total_ibs || 0)}</div>
+                        <div class="kpi-trend positive">Imposto sobre Bens e Serviços</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">TOTAL CBS</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.total_cbs || 0)}</div>
+                        <div class="kpi-trend positive">Contribuição sobre Bens e Serviços</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">TOTAL REFORMA</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.total_reforma || 0)}</div>
+                        <div class="kpi-trend positive">IBS + CBS</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">ALÍQUOTA MÉDIA IBS</div>
+                        <div class="kpi-value">${formatarValor(data.aliquota_media_ibs || 0)}%</div>
+                        <div class="kpi-trend">Alíquota efetiva</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">ALÍQUOTA MÉDIA CBS</div>
+                        <div class="kpi-value">${formatarValor(data.aliquota_media_cbs || 0)}%</div>
+                        <div class="kpi-trend">Alíquota efetiva</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">DOCUMENTOS COM REFORMA</div>
+                        <div class="kpi-value">${data.docs_com_reforma || 0}</div>
+                        <div class="kpi-trend positive">De ${data.total_docs || 0} totais</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="section-title">Comparativo IBS vs CBS</h3>
+                    <canvas id="chartReformaComparativo"></canvas>
+                </div>
+                
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">📊 Análise Comparativa: Tributação Antiga vs Nova</h3>
+                </div>
+                
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">TRIBUTOS ANTIGOS (PIS + COFINS)</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.total_pis_cofins || 0)}</div>
+                        <div class="kpi-trend">Sistema anterior</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">NOVOS TRIBUTOS (IBS + CBS)</div>
+                        <div class="kpi-value">R$ ${formatarValor(data.total_reforma || 0)}</div>
+                        <div class="kpi-trend positive">Sistema novo</div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-label">VARIAÇÃO</div>
+                        <div class="kpi-value ${data.variacao >= 0 ? 'negative' : 'positive'}">
+                            ${data.variacao >= 0 ? '+' : ''}${formatarValor(data.variacao || 0)}%
+                        </div>
+                        <div class="kpi-trend ${data.variacao >= 0 ? 'negative' : 'positive'}">
+                            ${data.variacao >= 0 ? 'Aumento' : 'Redução'} da carga tributária
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container" style="margin-top: 24px;">
+                    <h3 class="section-title">Distribuição por Situação Tributária IBS/CBS</h3>
+                    <canvas id="chartReformaSituacao"></canvas>
+                </div>
+                
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">📋 Top Produtos com Maior Impacto da Reforma</h3>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th style="text-align: right;">Quantidade</th>
+                            <th style="text-align: right;">Valor IBS</th>
+                            <th style="text-align: right;">Valor CBS</th>
+                            <th style="text-align: right;">Total Reforma</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${(data.top_produtos || []).map(prod => `
+                            <tr>
+                                <td><strong>${prod.produto}</strong></td>
+                                <td style="text-align: right;">${prod.quantidade}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_ibs)}</td>
+                                <td style="text-align: right;">R$ ${formatarValor(prod.valor_cbs)}</td>
+                                <td style="text-align: right;"><strong>R$ ${formatarValor(prod.total)}</strong></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div class="section-header" style="margin-top: 32px;">
+                    <h3 class="section-title">💡 Insights e Recomendações</h3>
+                </div>
+                
+                <div style="background: var(--bg-secondary); border-left: 4px solid var(--accent); padding: 20px; border-radius: 6px;">
+                    <ul style="margin: 0; padding-left: 20px; color: var(--text-primary);">
+                        ${(data.insights || []).map(insight => `<li style="margin-bottom: 12px;">${insight}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function formatarValor(valor) {
+            return new Intl.NumberFormat('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(valor);
+        }
+
+        // Inicializar
+        if (!token || !empresaId) {
+            window.location.href = '/painel';
+        } else {
+            carregarEmpresa();
+            carregarVisao(currentVision);
+        }
+    </script>
+</body>
+</html>
